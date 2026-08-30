@@ -1,0 +1,94 @@
+/**
+ * VERALUZ Design System — Token Source Unique (--vlz-*)
+ *
+ * Ces tokens sont la seule source de vérité visuelle.
+ * Ne jamais coder de valeurs brutes dans les composants.
+ * Toute modification passe par ce fichier.
+ *
+ * Convention : --vlz-{category}-{variant}-{property}
+ */
+
+:root {
+  /* ── Couleurs — Marque ── */
+  --vlz-color-brand-primary: #1b3a5c; /* Bleu nuit VERALUZ */
+  --vlz-color-brand-accent: #c89b4a; /* Or résidentiel */
+  --vlz-color-brand-surface: #f5f3ee; /* Beige ivoire */
+
+  /* ── Couleurs — Statut ── */
+  --vlz-color-status-success: #2e7d52;
+  --vlz-color-status-warning: #c17a1a;
+  --vlz-color-status-error: #b22d2d;
+  --vlz-color-status-info: #1e5f9a;
+
+  /* ── Couleurs — Neutres ── */
+  --vlz-color-neutral-0: #ffffff;
+  --vlz-color-neutral-50: #f8f8f6;
+  --vlz-color-neutral-100: #efefec;
+  --vlz-color-neutral-200: #d8d6d1;
+  --vlz-color-neutral-400: #9c9a95;
+  --vlz-color-neutral-600: #5a5855;
+  --vlz-color-neutral-800: #2c2b28;
+  --vlz-color-neutral-900: #111110;
+
+  /* ── Typographie ── */
+  --vlz-font-family-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --vlz-font-family-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  --vlz-font-size-xs: 0.75rem; /* 12px */
+  --vlz-font-size-sm: 0.875rem; /* 14px */
+  --vlz-font-size-base: 1rem; /* 16px */
+  --vlz-font-size-lg: 1.125rem; /* 18px */
+  --vlz-font-size-xl: 1.25rem; /* 20px */
+  --vlz-font-size-2xl: 1.5rem; /* 24px */
+  --vlz-font-size-3xl: 1.875rem; /* 30px */
+  --vlz-font-size-4xl: 2.25rem; /* 36px */
+
+  --vlz-font-weight-regular: 400;
+  --vlz-font-weight-medium: 500;
+  --vlz-font-weight-semibold: 600;
+  --vlz-font-weight-bold: 700;
+
+  --vlz-line-height-tight: 1.25;
+  --vlz-line-height-normal: 1.5;
+  --vlz-line-height-relaxed: 1.75;
+
+  /* ── Espacement ── */
+  --vlz-space-1: 0.25rem; /* 4px */
+  --vlz-space-2: 0.5rem; /* 8px */
+  --vlz-space-3: 0.75rem; /* 12px */
+  --vlz-space-4: 1rem; /* 16px */
+  --vlz-space-6: 1.5rem; /* 24px */
+  --vlz-space-8: 2rem; /* 32px */
+  --vlz-space-12: 3rem; /* 48px */
+  --vlz-space-16: 4rem; /* 64px */
+
+  /* ── Bordures ── */
+  --vlz-radius-sm: 0.25rem;
+  --vlz-radius-md: 0.5rem;
+  --vlz-radius-lg: 0.75rem;
+  --vlz-radius-full: 9999px;
+
+  --vlz-border-width-thin: 1px;
+  --vlz-border-width-medium: 2px;
+
+  /* ── Ombres ── */
+  --vlz-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --vlz-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --vlz-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* ── Transitions ── */
+  --vlz-transition-fast: 150ms ease;
+  --vlz-transition-normal: 250ms ease;
+  --vlz-transition-slow: 400ms ease;
+
+  /* ── Z-index ── */
+  --vlz-z-base: 0;
+  --vlz-z-elevated: 10;
+  --vlz-z-overlay: 100;
+  --vlz-z-modal: 1000;
+  --vlz-z-toast: 9000;
+
+  /* ── Layout ── */
+  --vlz-container-max: 1280px;
+  --vlz-sidebar-width: 256px;
+}

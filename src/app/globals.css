@@ -1,0 +1,36 @@
+@import "../styles/tokens.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--vlz-font-family-sans);
+  font-size: var(--vlz-font-size-base);
+  font-weight: var(--vlz-font-weight-regular);
+  line-height: var(--vlz-line-height-normal);
+  color: var(--vlz-color-neutral-800);
+  background-color: var(--vlz-color-brand-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
