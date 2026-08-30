@@ -26,9 +26,7 @@ export const publicEnvSchema = z.object({
  * Never exposed to the client bundle.
  */
 export const serverEnvSchema = z.object({
-  NODE_ENV: z
-    .enum(["development", "test", "production"])
-    .default("development"),
+  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   KJEMO_API_SECRET: z.string().optional().default(""),
   NEXT_PUBLIC_SUPABASE_URL: z
     .string()
