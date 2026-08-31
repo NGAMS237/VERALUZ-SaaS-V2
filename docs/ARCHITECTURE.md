@@ -87,11 +87,11 @@ Persistance
 
 Toutes les routes API internes utilisent le préfixe `/api/kjemo/v1/`.
 
-| Route                        | Méthode | Description              | Auth |
-| ---------------------------- | ------- | ------------------------ | ---- |
-| `/api/kjemo/v1/manifest`     | GET     | Métadonnées instance     | Non  |
-| `/api/kjemo/v1/health/live`  | GET     | Liveness probe           | Non  |
-| `/api/kjemo/v1/health/ready` | GET     | Readiness probe          | Non  |
+| Route                        | Méthode | Description          | Auth |
+| ---------------------------- | ------- | -------------------- | ---- |
+| `/api/kjemo/v1/manifest`     | GET     | Métadonnées instance | Non  |
+| `/api/kjemo/v1/health/live`  | GET     | Liveness probe       | Non  |
+| `/api/kjemo/v1/health/ready` | GET     | Readiness probe      | Non  |
 
 ### Sémantique liveness vs readiness
 

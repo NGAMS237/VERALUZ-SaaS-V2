@@ -45,25 +45,25 @@ pnpm dev
 
 ## Commandes disponibles
 
-| Commande              | Description                          |
-| --------------------- | ------------------------------------ |
-| `pnpm dev`            | Serveur de développement (Turbopack) |
-| `pnpm build`          | Build de production                  |
-| `pnpm lint`           | Lint ESLint (0 warning toléré)       |
-| `pnpm format:check`   | Vérification Prettier                |
-| `pnpm typecheck`      | Vérification TypeScript              |
-| `pnpm test`           | Tests unitaires Vitest               |
-| `pnpm test:coverage`  | Tests avec couverture ≥ 80 %         |
-| `pnpm validate`       | Toutes les vérifications en séquence |
-| `pnpm audit`          | Audit de sécurité des dépendances    |
+| Commande             | Description                          |
+| -------------------- | ------------------------------------ |
+| `pnpm dev`           | Serveur de développement (Turbopack) |
+| `pnpm build`         | Build de production                  |
+| `pnpm lint`          | Lint ESLint (0 warning toléré)       |
+| `pnpm format:check`  | Vérification Prettier                |
+| `pnpm typecheck`     | Vérification TypeScript              |
+| `pnpm test`          | Tests unitaires Vitest               |
+| `pnpm test:coverage` | Tests avec couverture ≥ 80 %         |
+| `pnpm validate`      | Toutes les vérifications en séquence |
+| `pnpm audit`         | Audit de sécurité des dépendances    |
 
 ## Endpoints API
 
-| Endpoint                         | Description                         |
-| -------------------------------- | ----------------------------------- |
-| `GET /api/kjemo/v1/manifest`     | Métadonnées de l'instance           |
-| `GET /api/kjemo/v1/health/live`  | Liveness probe (toujours 200)       |
-| `GET /api/kjemo/v1/health/ready` | Readiness probe (503 en maintenance)|
+| Endpoint                         | Description                          |
+| -------------------------------- | ------------------------------------ |
+| `GET /api/kjemo/v1/manifest`     | Métadonnées de l'instance            |
+| `GET /api/kjemo/v1/health/live`  | Liveness probe (toujours 200)        |
+| `GET /api/kjemo/v1/health/ready` | Readiness probe (503 en maintenance) |
 
 ## Conventions
 

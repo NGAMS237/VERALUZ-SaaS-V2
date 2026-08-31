@@ -93,15 +93,15 @@ veraluz-v2/
 
 ## Tests réellement exécutés et résultats
 
-| Test             | Commande                    | Résultat            |
-| ---------------- | --------------------------- | ------------------- |
-| Formatage        | `pnpm format:check`         | ✅ PASS             |
-| Lint             | `pnpm lint`                 | ✅ PASS (0 warning) |
-| Typecheck        | `pnpm typecheck`            | ✅ PASS             |
-| Tests unitaires  | `pnpm test`                 | ✅ 15/15 PASS       |
-| Build production | `pnpm build`                | ✅ PASS             |
-| Espaces blancs    | `git diff --check HEAD`     | ✅ PASS (post-commit F0) |
-| Secret scan      | grep patterns               | ✅ PASS (0 secret)  |
+| Test             | Commande                | Résultat                 |
+| ---------------- | ----------------------- | ------------------------ |
+| Formatage        | `pnpm format:check`     | ✅ PASS                  |
+| Lint             | `pnpm lint`             | ✅ PASS (0 warning)      |
+| Typecheck        | `pnpm typecheck`        | ✅ PASS                  |
+| Tests unitaires  | `pnpm test`             | ✅ 15/15 PASS            |
+| Build production | `pnpm build`            | ✅ PASS                  |
+| Espaces blancs   | `git diff --check HEAD` | ✅ PASS (post-commit F0) |
+| Secret scan      | grep patterns           | ✅ PASS (0 secret)       |
 
 ---
 
@@ -177,25 +177,25 @@ cat AI_HANDOFF.md
 
 ### Commits F0-R1 (sur `claude/f0-review-fixes`)
 
-| Commit  | Message                                                | Corrections           |
-| ------- | ------------------------------------------------------ | --------------------- |
-| 193dd41 | fix(f0): enforce validated environment and health semantics | R1-06 R1-07 R1-08 R1-09 R1-11 R1-12 R1-13 R1-14 |
-| 6af69ab | fix(f0): harden ci dependencies and coverage checks    | R1-10 R1-15 R1-16     |
+| Commit  | Message                                                     | Corrections                                      |
+| ------- | ----------------------------------------------------------- | ------------------------------------------------ |
+| 193dd41 | fix(f0): enforce validated environment and health semantics | R1-06 R1-07 R1-08 R1-09 R1-11 R1-12 R1-13 R1-14  |
+| 6af69ab | fix(f0): harden ci dependencies and coverage checks         | R1-10 R1-15 R1-16                                |
 | f63822f | docs(f0): correct product architecture and agent governance | R1-01 R1-02 R1-03 R1-04 R1-05 + roadmap complète |
 
 Le commit final (AI_HANDOFF.md) sera ajouté sur cette même branche.
 
 ### Résultats des tests F0-R1
 
-| Test            | Commande              | Résultat          |
-| --------------- | --------------------- | ----------------- |
-| Tests unitaires | `pnpm test`           | ✅ 32/32 PASS     |
-| Format          | `pnpm format:check`   | À exécuter en GA  |
-| Lint            | `pnpm lint`           | À exécuter en GA  |
-| Typecheck       | `pnpm typecheck`      | À exécuter en GA  |
-| Build           | `pnpm build`          | À exécuter en GA  |
-| Audit           | `pnpm audit`          | À exécuter en GA  |
-| Whitespace      | `git diff --check`    | ✅ PASS (pré-commit) |
+| Test            | Commande            | Résultat             |
+| --------------- | ------------------- | -------------------- |
+| Tests unitaires | `pnpm test`         | ✅ 32/32 PASS        |
+| Format          | `pnpm format:check` | À exécuter en GA     |
+| Lint            | `pnpm lint`         | À exécuter en GA     |
+| Typecheck       | `pnpm typecheck`    | À exécuter en GA     |
+| Build           | `pnpm build`        | À exécuter en GA     |
+| Audit           | `pnpm audit`        | À exécuter en GA     |
+| Whitespace      | `git diff --check`  | ✅ PASS (pré-commit) |
 
 > Note : format:check, lint, typecheck et build nécessitent l'accès réseau pour
 > résoudre les modules Next.js. Ces étapes sont couvertes par la CI GitHub Actions
@@ -203,24 +203,24 @@ Le commit final (AI_HANDOFF.md) sera ajouté sur cette même branche.
 
 ### Corrections appliquées (R1-01 à R1-16)
 
-| Ref   | Fichier(s) principal(aux)                     | Nature                                        |
-| ----- | --------------------------------------------- | --------------------------------------------- |
+| Ref   | Fichier(s) principal(aux)                     | Nature                                                     |
+| ----- | --------------------------------------------- | ---------------------------------------------------------- |
 | R1-01 | `AI_HANDOFF.md`                               | Trailing spaces, déclaration check corrigée, section F0-R1 |
-| R1-02 | `AGENTS.md`                                   | Table des rôles, conventions branches         |
-| R1-03 | `DECISIONS.md`                                | Zod 3.24.4 (pas 4.5.4), DECISION-008 ajoutée |
-| R1-04 | `ROADMAP.md`                                  | Roadmap plateforme complète (23 lots)         |
-| R1-05 | `docs/ARCHITECTURE.md` `docs/PRODUCT.md` etc. | Versions, région, Cameroun-first              |
-| R1-06 | `src/lib/config/env.schema.ts`                | `z.enum(["true","false"])` strict             |
-| R1-07 | `src/lib/config/version.ts` (nouveau)         | APP_VERSION depuis package.json               |
-| R1-08 | `src/app/api/kjemo/v1/health/live/route.ts`   | Toujours 200 — liveness correcte             |
-| R1-09 | `src/app/api/kjemo/v1/health/ready/route.ts`  | Nouveau — readiness 200/503                  |
-| R1-10 | `package.json` `.npmrc` `pnpm-workspace.yaml` | minimumReleaseAge=1440, @types/node 22.20.1  |
-| R1-11 | `src/app/page.tsx` `src/styles/tokens.css`    | Tokens CSS, suppression valeurs brutes        |
-| R1-12 | `src/instrumentation.ts` (nouveau)            | Validation env au démarrage serveur           |
-| R1-13 | `tests/api/health-live.test.ts`               | Maintenance → 200 (liveness)                 |
-| R1-14 | `tests/api/health-ready.test.ts` (nouveau)    | 6 tests readiness avec vi.resetModules()     |
-| R1-15 | `.github/workflows/ci.yml`                    | Actions pinnées SHA, pnpm audit               |
-| R1-16 | `next.config.ts`                              | Suppression X-XSS-Protection obsolète         |
+| R1-02 | `AGENTS.md`                                   | Table des rôles, conventions branches                      |
+| R1-03 | `DECISIONS.md`                                | Zod 3.24.4 (pas 4.5.4), DECISION-008 ajoutée               |
+| R1-04 | `ROADMAP.md`                                  | Roadmap plateforme complète (23 lots)                      |
+| R1-05 | `docs/ARCHITECTURE.md` `docs/PRODUCT.md` etc. | Versions, région, Cameroun-first                           |
+| R1-06 | `src/lib/config/env.schema.ts`                | `z.enum(["true","false"])` strict                          |
+| R1-07 | `src/lib/config/version.ts` (nouveau)         | APP_VERSION depuis package.json                            |
+| R1-08 | `src/app/api/kjemo/v1/health/live/route.ts`   | Toujours 200 — liveness correcte                           |
+| R1-09 | `src/app/api/kjemo/v1/health/ready/route.ts`  | Nouveau — readiness 200/503                                |
+| R1-10 | `package.json` `.npmrc` `pnpm-workspace.yaml` | minimumReleaseAge=1440, @types/node 22.20.1                |
+| R1-11 | `src/app/page.tsx` `src/styles/tokens.css`    | Tokens CSS, suppression valeurs brutes                     |
+| R1-12 | `src/instrumentation.ts` (nouveau)            | Validation env au démarrage serveur                        |
+| R1-13 | `tests/api/health-live.test.ts`               | Maintenance → 200 (liveness)                               |
+| R1-14 | `tests/api/health-ready.test.ts` (nouveau)    | 6 tests readiness avec vi.resetModules()                   |
+| R1-15 | `.github/workflows/ci.yml`                    | Actions pinnées SHA, pnpm audit                            |
+| R1-16 | `next.config.ts`                              | Suppression X-XSS-Protection obsolète                      |
 
 ### Commande pour Codex — Démarrage de la seconde revue
 

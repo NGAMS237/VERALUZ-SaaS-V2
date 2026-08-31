@@ -25,6 +25,7 @@ Disponibilité
 ```
 
 **Règles absolues :**
+
 - Une réservation confirmée ou payée n'est **pas** un check-in.
 - Le check-in intervient lors de l'arrivée physique.
 - Le Guest Portal peut exister avant l'arrivée avec des accès limités.
@@ -170,6 +171,7 @@ Corrections R1-01 à R1-16 sur le socle F0.
 **Source** : `NGAMS237/veraluz-os` (lecture seule)
 
 Audit autorisé :
+
 1. Lecture seule du code V1
 2. Inventaire des fonctionnalités de réservation
 3. Extraction des règles métier et machines d'états
@@ -178,6 +180,7 @@ Audit autorisé :
 6. Production des tests d'acceptation V2
 
 Interdit :
+
 - Importer les fichiers source V1
 - Copier-coller le monolithe
 - Importer les composants HTML V1

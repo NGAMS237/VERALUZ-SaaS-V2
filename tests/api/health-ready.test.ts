@@ -18,8 +18,7 @@ describe("GET /api/kjemo/v1/health/ready", () => {
 
   beforeEach(() => {
     // Snapshot current env
-    savedEnv["NEXT_PUBLIC_FEATURE_MAINTENANCE"] =
-      process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"];
+    savedEnv["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"];
     process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = "false";
     // Reset module cache so env.ts re-evaluates with current process.env
     vi.resetModules();

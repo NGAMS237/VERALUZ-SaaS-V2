@@ -2,12 +2,12 @@
 
 ## Rôles et alternance
 
-| Lot    | Implémenteur | Reviewer |
-| ------ | ------------ | -------- |
-| F0     | Claude       | Codex    |
-| F0-R1  | Claude       | Codex    |
-| F1     | Codex        | Claude   |
-| F1-R1  | Codex        | Claude   |
+| Lot   | Implémenteur | Reviewer |
+| ----- | ------------ | -------- |
+| F0    | Claude       | Codex    |
+| F0-R1 | Claude       | Codex    |
+| F1    | Codex        | Claude   |
+| F1-R1 | Codex        | Claude   |
 
 **Règle absolue** : Implémenteur et Reviewer ne modifient jamais simultanément les mêmes fichiers.
 

@@ -5,12 +5,12 @@ Il ne recopie pas le protocole général — lire `AGENTS.md` en premier.
 
 ## Rôle de Codex par lot
 
-| Lot    | Rôle Codex    |
-| ------ | ------------- |
-| F0     | Reviewer      |
-| F0-R1  | Reviewer      |
-| F1     | Implémenteur  |
-| F1-R1  | Reviewer      |
+| Lot   | Rôle Codex   |
+| ----- | ------------ |
+| F0    | Reviewer     |
+| F0-R1 | Reviewer     |
+| F1    | Implémenteur |
+| F1-R1 | Reviewer     |
 
 Le rôle alterne : Codex implémente les lots impairs, Claude implémente les lots pairs (convention initiale). Le rôle exact est confirmé dans le prompt de lot fourni par Blaise.
 

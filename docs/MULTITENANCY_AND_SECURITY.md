@@ -97,12 +97,12 @@ Pipeline CI avec gitleaks sur chaque push (action pinnée au SHA).
 
 ## Plan de sécurité par lot
 
-| Lot | Sécurité implémentée                               |
-| --- | -------------------------------------------------- |
-| F0  | En-têtes HTTP, validation env stricte, scan CI     |
-| F1  | Supabase Auth, RLS + memberships, résolution tenant|
-| F2  | Audit logs, permissions granulaires                |
-| F3  | Chiffrement données sensibles                      |
+| Lot | Sécurité implémentée                                |
+| --- | --------------------------------------------------- |
+| F0  | En-têtes HTTP, validation env stricte, scan CI      |
+| F1  | Supabase Auth, RLS + memberships, résolution tenant |
+| F2  | Audit logs, permissions granulaires                 |
+| F3  | Chiffrement données sensibles                       |
 
 ## Décisions régionales et réglementaires
 

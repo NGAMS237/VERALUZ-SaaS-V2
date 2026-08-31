@@ -82,6 +82,7 @@ git diff --check "$(git merge-base HEAD origin/claude/f0-foundation-bootstrap 2>
 ## Exceptions SVG structurelles
 
 Les attributs suivants sont acceptés en valeur brute dans les fichiers SVG et JSX :
+
 - `viewBox`, `d` (path data), `x`, `y`, `rx`, `ry`, `cx`, `cy`, `r`
 - `fontSize`, `fontWeight`, `fontFamily` sur des éléments `<text>` SVG
 - `width`, `height` sur `<svg>` → préférer `style={{ width: "var(--vlz-...)" }}`

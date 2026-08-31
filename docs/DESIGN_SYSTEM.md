@@ -26,17 +26,17 @@ Les attributs SVG suivants sont acceptés en valeur brute car ils sont intrinsè
 à la géométrie du SVG et ne peuvent pas recevoir `var()` en position d'attribut
 standard :
 
-| Attribut          | Justification                                      |
-| ----------------- | -------------------------------------------------- |
-| `viewBox`         | Valeur composite, pas une valeur CSS               |
+| Attribut          | Justification                                             |
+| ----------------- | --------------------------------------------------------- |
+| `viewBox`         | Valeur composite, pas une valeur CSS                      |
 | `width`, `height` | Sur `<svg>` : remplacer par `style={{ width: var(...) }}` |
-| `rx`, `ry`        | Coordonnée géométrique de rect                     |
-| `x`, `y`          | Coordonnées de texte SVG                           |
-| `d`               | Données de tracé (path)                            |
-| `textAnchor`      | Attribut de présentation SVG                       |
-| `fontSize`        | Présentation SVG — valeur de design constante      |
-| `fontWeight`      | Présentation SVG — valeur de design constante      |
-| `fontFamily`      | Présentation SVG — valeur de design constante      |
+| `rx`, `ry`        | Coordonnée géométrique de rect                            |
+| `x`, `y`          | Coordonnées de texte SVG                                  |
+| `d`               | Données de tracé (path)                                   |
+| `textAnchor`      | Attribut de présentation SVG                              |
+| `fontSize`        | Présentation SVG — valeur de design constante             |
+| `fontWeight`      | Présentation SVG — valeur de design constante             |
+| `fontFamily`      | Présentation SVG — valeur de design constante             |
 
 **Règle** : les attributs `fill` et `stroke` DOIVENT utiliser des tokens CSS (`var(--vlz-*)`).
 Les attributs géométriques (`width`, `height`, `rx`, `x`, `y`, données `d`) sont des exceptions.
@@ -46,23 +46,23 @@ Pour les dimensions rendues d'un élément SVG (la taille affichée), utiliser
 
 ## Catégories de tokens
 
-| Catégorie          | Préfixe                                  | Description                   |
-| ------------------ | ---------------------------------------- | ----------------------------- |
-| Couleurs marque    | `--vlz-color-brand-*`                    | Bleu nuit, Or, Beige          |
-| Couleurs statut    | `--vlz-color-status-*`                   | Succès, Erreur, Avertissement |
-| Couleurs neutres   | `--vlz-color-neutral-*`                  | Échelle de gris               |
-| Typographie        | `--vlz-font-*`                           | Famille, taille, graisse      |
-| Espacement         | `--vlz-space-*`                          | Marges et paddings            |
-| Bordures           | `--vlz-radius-*`, `--vlz-border-*`       | Rayons et épaisseurs          |
-| Ombres             | `--vlz-shadow-*`                         | Élévations                    |
-| Transitions        | `--vlz-transition-*`                     | Durées et courbes             |
-| Z-index            | `--vlz-z-*`                              | Couches d'empilement          |
-| Layout             | `--vlz-container-*`, `--vlz-sidebar-*`   | Dimensions structurelles      |
-| Viewport           | `--vlz-viewport-*`                       | Hauteurs de viewport          |
-| Contenu            | `--vlz-content-*`                        | Largeurs maximales de contenu |
-| Lettrage           | `--vlz-letter-spacing-*`                 | Espacement des caractères     |
-| Forme              | `--vlz-radius-circle`                    | Cercle parfait (50%)          |
-| Icônes             | `--vlz-icon-size-*`                      | Tailles des icônes            |
+| Catégorie        | Préfixe                                | Description                   |
+| ---------------- | -------------------------------------- | ----------------------------- |
+| Couleurs marque  | `--vlz-color-brand-*`                  | Bleu nuit, Or, Beige          |
+| Couleurs statut  | `--vlz-color-status-*`                 | Succès, Erreur, Avertissement |
+| Couleurs neutres | `--vlz-color-neutral-*`                | Échelle de gris               |
+| Typographie      | `--vlz-font-*`                         | Famille, taille, graisse      |
+| Espacement       | `--vlz-space-*`                        | Marges et paddings            |
+| Bordures         | `--vlz-radius-*`, `--vlz-border-*`     | Rayons et épaisseurs          |
+| Ombres           | `--vlz-shadow-*`                       | Élévations                    |
+| Transitions      | `--vlz-transition-*`                   | Durées et courbes             |
+| Z-index          | `--vlz-z-*`                            | Couches d'empilement          |
+| Layout           | `--vlz-container-*`, `--vlz-sidebar-*` | Dimensions structurelles      |
+| Viewport         | `--vlz-viewport-*`                     | Hauteurs de viewport          |
+| Contenu          | `--vlz-content-*`                      | Largeurs maximales de contenu |
+| Lettrage         | `--vlz-letter-spacing-*`               | Espacement des caractères     |
+| Forme            | `--vlz-radius-circle`                  | Cercle parfait (50%)          |
+| Icônes           | `--vlz-icon-size-*`                    | Tailles des icônes            |
 
 ## Palette principale
 

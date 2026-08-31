@@ -2,11 +2,11 @@
 
 ## Stratégie de tests
 
-| Niveau      | Framework        | Répertoire                 | Couverture cible              |
-| ----------- | ---------------- | -------------------------- | ----------------------------- |
+| Niveau      | Framework        | Répertoire                 | Couverture cible                |
+| ----------- | ---------------- | -------------------------- | ------------------------------- |
 | Unitaires   | Vitest           | `tests/`                   | ≥ 80 % sur `lib/` et `app/api/` |
-| Intégration | Vitest           | `tests/integration/` (F1+) | Endpoints avec DB locale      |
-| E2E         | Playwright (F1+) | `e2e/`                     | Parcours critiques            |
+| Intégration | Vitest           | `tests/integration/` (F1+) | Endpoints avec DB locale        |
+| E2E         | Playwright (F1+) | `e2e/`                     | Parcours critiques              |
 
 ## Commandes
 

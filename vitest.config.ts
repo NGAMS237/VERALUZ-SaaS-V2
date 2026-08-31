@@ -12,10 +12,7 @@ export default defineConfig({
       reporter: ["text", "json"],
       // HTML report excluded from CI artifacts (too large); generate locally only.
       // To generate: pnpm test:coverage -- --reporter=html
-      include: [
-        "src/lib/**/*.ts",
-        "src/app/api/**/*.ts",
-      ],
+      include: ["src/lib/**/*.ts", "src/app/api/**/*.ts"],
       exclude: [
         "node_modules",
         ".next",
