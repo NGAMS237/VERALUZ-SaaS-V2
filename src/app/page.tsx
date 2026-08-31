@@ -10,12 +10,19 @@ export const metadata: Metadata = {
  * VERALUZ SaaS V2 est actuellement en construction.
  * Aucune fonctionnalité n'est encore disponible.
  * Cette page disparaîtra dès le lot UI-1.
+ *
+ * Toutes les valeurs visuelles utilisent les tokens --vlz-* de tokens.css.
+ *
+ * Exceptions SVG structurelles (viewBox, coordonnées géométriques,
+ * coordonnées de texte, rx) : ces attributs intrinsèques ne peuvent pas
+ * recevoir de var() en position d'attribut SVG standard. Ils sont
+ * documentés dans docs/DESIGN_SYSTEM.md.
  */
 export default function HomePage(): React.JSX.Element {
   return (
     <main
       style={{
-        minHeight: "100dvh",
+        minHeight: "var(--vlz-viewport-min-full)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -25,8 +32,15 @@ export default function HomePage(): React.JSX.Element {
         gap: "var(--vlz-space-6)",
       }}
     >
-      {/* Wordmark */}
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      {/* Wordmark — SVG structural exceptions: viewBox, width/height attrs,
+          rx, x/y coords, fontSize/fontWeight presentation attributes.
+          See docs/DESIGN_SYSTEM.md §SVG exceptions. */}
+      <svg
+        style={{ width: "var(--vlz-icon-size-wordmark)", height: "var(--vlz-icon-size-wordmark)" }}
+        viewBox="0 0 48 48"
+        fill="none"
+        aria-hidden="true"
+      >
         <rect width="48" height="48" rx="12" fill="var(--vlz-color-brand-primary)" />
         <text
           x="24"
@@ -56,7 +70,7 @@ export default function HomePage(): React.JSX.Element {
           style={{
             fontSize: "var(--vlz-font-size-sm)",
             color: "var(--vlz-color-neutral-600)",
-            letterSpacing: "0.1em",
+            letterSpacing: "var(--vlz-letter-spacing-wide)",
             textTransform: "uppercase",
           }}
         >
@@ -66,7 +80,7 @@ export default function HomePage(): React.JSX.Element {
 
       <p
         style={{
-          maxWidth: "480px",
+          maxWidth: "var(--vlz-content-max-prose)",
           fontSize: "var(--vlz-font-size-base)",
           color: "var(--vlz-color-neutral-600)",
           lineHeight: "var(--vlz-line-height-relaxed)",
@@ -92,9 +106,9 @@ export default function HomePage(): React.JSX.Element {
         <span
           style={{
             display: "inline-block",
-            width: "8px",
-            height: "8px",
-            borderRadius: "50%",
+            width: "var(--vlz-space-2)",
+            height: "var(--vlz-space-2)",
+            borderRadius: "var(--vlz-radius-circle)",
             backgroundColor: "var(--vlz-color-status-warning)",
           }}
         />

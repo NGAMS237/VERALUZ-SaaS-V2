@@ -1,5 +1,14 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
+/**
+ * Tests for GET /api/kjemo/v1/health/live
+ *
+ * Liveness contract:
+ * - Always returns 200 when the process is alive
+ * - Returns 200 EVEN in maintenance mode (liveness ≠ readiness)
+ * - Never reads process.env directly (uses validated env from env.ts)
+ * - Returns a valid ISO 8601 timestamp and non-negative integer uptime
+ */
 describe("GET /api/kjemo/v1/health/live", () => {
   const savedMaintenance = process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"];
 
@@ -11,10 +20,11 @@ describe("GET /api/kjemo/v1/health/live", () => {
     }
   });
 
-  it("returns 200 with status ok when not in maintenance", async () => {
+  beforeEach(() => {
     process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = "false";
+  });
 
-    // Reset module cache to pick up env change
+  it("returns 200 with status ok when not in maintenance", async () => {
     const { GET } = await import("@/app/api/kjemo/v1/health/live/route");
 
     const mockReq = new Request("http://localhost:3000/api/kjemo/v1/health/live");
@@ -23,12 +33,22 @@ describe("GET /api/kjemo/v1/health/live", () => {
     expect(response.status).toBe(200);
     const body = (await response.json()) as Record<string, unknown>;
     expect(body["status"]).toBe("ok");
-    expect(typeof body["timestamp"]).toBe("string");
-    expect(typeof body["uptime"]).toBe("number");
+  });
+
+  it("returns 200 with status ok even when FEATURE_MAINTENANCE is true", async () => {
+    // Liveness must NOT return 503 for maintenance — only readiness does.
+    process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = "true";
+    const { GET } = await import("@/app/api/kjemo/v1/health/live/route");
+
+    const mockReq = new Request("http://localhost:3000/api/kjemo/v1/health/live");
+    const response = await GET(mockReq as Parameters<typeof GET>[0]);
+
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as Record<string, unknown>;
+    expect(body["status"]).toBe("ok");
   });
 
   it("timestamp is a valid ISO 8601 date", async () => {
-    process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = "false";
     const { GET } = await import("@/app/api/kjemo/v1/health/live/route");
 
     const mockReq = new Request("http://localhost:3000/api/kjemo/v1/health/live");
@@ -39,20 +59,7 @@ describe("GET /api/kjemo/v1/health/live", () => {
     expect(parsed.getTime()).not.toBeNaN();
   });
 
-  it("returns 503 with status degraded when maintenance=true", async () => {
-    process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = "true";
-    const { GET } = await import("@/app/api/kjemo/v1/health/live/route");
-
-    const mockReq = new Request("http://localhost:3000/api/kjemo/v1/health/live");
-    const response = await GET(mockReq as Parameters<typeof GET>[0]);
-
-    expect(response.status).toBe(503);
-    const body = (await response.json()) as Record<string, unknown>;
-    expect(body["status"]).toBe("degraded");
-  });
-
   it("uptime is a non-negative integer", async () => {
-    process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = "false";
     const { GET } = await import("@/app/api/kjemo/v1/health/live/route");
 
     const mockReq = new Request("http://localhost:3000/api/kjemo/v1/health/live");

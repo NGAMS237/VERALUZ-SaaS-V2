@@ -3,14 +3,17 @@ import { fullEnvSchema, type FullEnv } from "./env.schema";
 /**
  * Validated server-side environment configuration.
  *
- * Import this instead of accessing process.env directly.
+ * This is the ONLY authorised access point for environment variables
+ * in application code under src/. Tests may manipulate process.env
+ * directly to isolate scenarios.
+ *
  * Throws at startup if required variables are missing or malformed.
  *
  * @example
  * import { env } from "@/lib/config/env";
- * console.log(env.NEXT_PUBLIC_APP_VERSION);
+ * if (env.NEXT_PUBLIC_FEATURE_MAINTENANCE) { ... }
  */
-function validateEnv(): FullEnv {
+export function validateEnv(): FullEnv {
   const result = fullEnvSchema.safeParse(process.env);
 
   if (!result.success) {
@@ -25,5 +28,6 @@ function validateEnv(): FullEnv {
   return result.data;
 }
 
-// Validate once at module load time — fails fast on misconfiguration
+// Validate once at module load time — fails fast on misconfiguration.
+// Imported by src/instrumentation.ts to run before the first request.
 export const env = validateEnv();
