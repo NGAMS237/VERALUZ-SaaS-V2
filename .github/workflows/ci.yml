@@ -10,8 +10,13 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Minimal read-only permissions for all jobs by default.
+# Individual jobs may declare additional permissions explicitly.
+permissions:
+  contents: read
+
 env:
-  NODE_VERSION: "22"
+  NODE_VERSION: "22.23.2"
   PNPM_VERSION: "11.24.0"
 
 jobs:
@@ -22,15 +27,17 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0 # full history for whitespace delta check
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@0c17529a66aca453f9227af23103ed11469b1e47 # v4.0.0
         with:
           version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
@@ -47,11 +54,10 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Unit tests
-        run: pnpm test
+      - name: Unit tests with coverage
+        run: pnpm test:coverage
         env:
           NEXT_PUBLIC_APP_ENV: test
-          NEXT_PUBLIC_APP_VERSION: "0.1.0"
           NEXT_PUBLIC_TENANT_ID: ci-tenant
           NEXT_PUBLIC_FEATURE_MAINTENANCE: "false"
           NODE_ENV: test
@@ -60,13 +66,29 @@ jobs:
         run: pnpm build
         env:
           NEXT_PUBLIC_APP_ENV: production
-          NEXT_PUBLIC_APP_VERSION: "0.1.0"
           NEXT_PUBLIC_TENANT_ID: ci-tenant
           NEXT_PUBLIC_FEATURE_MAINTENANCE: "false"
           NODE_ENV: production
 
-      - name: Check for whitespace errors (git diff --check)
-        run: git diff --check
+      - name: Audit dependencies
+        run: pnpm audit
+        continue-on-error: false
+
+      - name: Check whitespace errors (committed delta)
+        run: |
+          # Resolve the comparison base depending on the event type.
+          # On a pull_request, compare the PR head against its merge base.
+          # On a push, compare the current commit against its parent,
+          # handling the edge case of an initial push with no prior SHA.
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            # First push on a new branch — compare against the empty tree
+            BASE_SHA=$(git hash-object -t tree /dev/null)
+          else
+            BASE_SHA="${{ github.event.before }}"
+          fi
+          git diff --check "$BASE_SHA" HEAD
 
   security:
     name: Secret scan
@@ -75,9 +97,11 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
 
       - name: Scan for accidental secrets
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

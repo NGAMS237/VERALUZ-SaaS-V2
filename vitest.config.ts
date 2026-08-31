@@ -9,8 +9,26 @@ export default defineConfig({
     exclude: ["node_modules", ".next"],
     coverage: {
       provider: "v8",
-      reporter: ["text", "json", "html"],
-      exclude: ["node_modules", ".next", "tests"],
+      reporter: ["text", "json"],
+      // HTML report excluded from CI artifacts (too large); generate locally only.
+      // To generate: pnpm test:coverage -- --reporter=html
+      include: [
+        "src/lib/**/*.ts",
+        "src/app/api/**/*.ts",
+      ],
+      exclude: [
+        "node_modules",
+        ".next",
+        "tests",
+        // Exclude type-only files and barrel re-exports
+        "**/*.d.ts",
+      ],
+      thresholds: {
+        lines: 80,
+        statements: 80,
+        functions: 80,
+        branches: 80,
+      },
     },
     setupFiles: ["./tests/setup.ts"],
   },

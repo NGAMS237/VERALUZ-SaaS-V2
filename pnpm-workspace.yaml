@@ -1,10 +1,2 @@
 packages:
   - "."
-
-minimumReleaseAgeStrict: false
-
-minimumReleaseAge: 0
-
-allowBuilds:
-  esbuild: false
-  unrs-resolver: false
