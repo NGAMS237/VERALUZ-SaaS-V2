@@ -2,15 +2,19 @@
 
 ## Vision
 
-VERALUZ SaaS V2 est une plateforme multi-tenant de gestion résidentielle,
-conçue pour les gestionnaires d'immeubles résidentiels au Québec.
+VERALUZ SaaS V2 est une plateforme multi-tenant destinée aux résidences,
+hôtels et établissements d'hébergement. Le lancement est orienté Cameroun,
+avec une architecture conçue pour s'étendre progressivement à d'autres pays
+africains.
 
 ## Premier tenant pilote
 
 **La Résidence VERALUZ** — `veraluz-001`
 
-Cette résidence sera le terrain de validation de chaque fonctionnalité
-avant déploiement général.
+Ce tenant sera le terrain de validation de chaque fonctionnalité avant
+déploiement général. Les décisions de configuration propres à ce tenant
+(région, domaine, paramètres locaux) seront définies avec Blaise avant le
+déploiement.
 
 ## Modules prévus
 
@@ -22,14 +26,16 @@ avant déploiement général.
 | Communications | Messages et avis                    | F3  |
 | Rapports       | Tableaux de bord et exports         | F3  |
 
-## Contraintes réglementaires
+## Décisions en attente
 
-- Données hébergées au Canada (Supabase région ca-central-1)
-- Conformité LPRPDE / Loi 25 (Québec)
-- Rétention des données configurable par tenant
+Les points suivants seront décidés avec Blaise avant tout déploiement :
+
+- Région d'hébergement des données (Supabase ou autre)
+- Domaine internet de l'application
+- Pays et réglementations applicables
+- Certifications ou normes à respecter
 
 ## Principes UX
 
 - Interface sobre et professionnelle
-- Vocabulaire adapté au secteur résidentiel québécois
 - Accessibilité WCAG 2.1 AA (cible F2+)

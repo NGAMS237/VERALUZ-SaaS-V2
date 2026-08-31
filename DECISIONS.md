@@ -47,7 +47,7 @@
 - **Contexte** : Jest est lent avec ESM et TypeScript. Vitest est natif Vite, compatible avec l'écosystème Next.js.
 - **Décision** : Vitest 4.1.11 avec environnement Node pour les tests API.
 - **Alternatives** : Jest (config ESM complexe), Playwright uniquement (pas de tests unitaires).
-- **Conséquences** : `vitest.config.ts` séparé, alias `@/` configuré manuellement.
+- **Conséquences** : `vitest.config.ts` séparé, alias `@/` configuré manuellement, couverture ≥ 80 % sur `src/lib/` et `src/app/api/`.
 
 ## [DECISION-004] Zod pour la validation de configuration serveur
 
@@ -56,9 +56,11 @@
 - **Statut** : Acceptée
 - **Décideur** : Claude
 - **Contexte** : Les variables d'environnement manquantes ou malformées causent des bugs silencieux en production.
-- **Décision** : Zod 4.5.4 avec `safeParse` au démarrage, échec rapide si invalide.
+- **Décision** : Zod 3.24.4 avec `safeParse` au démarrage, échec rapide si invalide. Versions exactes dans `package.json`.
 - **Alternatives** : t3-env (dépendance additionnelle), validation manuelle (fragile).
-- **Conséquences** : `src/lib/config/env.ts` est le seul point d'accès aux env vars côté serveur.
+- **Conséquences** : `src/lib/config/env.ts` est le seul point d'accès aux env vars côté serveur. `FEATURE_MAINTENANCE` utilise un enum strict — `"True"`, `"yes"`, `"1"` sont rejetés.
+
+Note : Zod 4.x n'a pas été retenu en F0 car il était trop récent au moment du développement (politique supply-chain minimumReleaseAge).
 
 ## [DECISION-005] Namespace API `kjemo/v1`
 
@@ -80,7 +82,7 @@
 - **Contexte** : Besoin de cohérence visuelle et de thémabilité multi-tenant future.
 - **Décision** : Tous les tokens définis dans `src/styles/tokens.css`, convention `--vlz-{category}-{variant}-{property}`.
 - **Alternatives** : Tailwind CSS (config JS, moins portable), CSS Modules sans tokens (duplication).
-- **Conséquences** : Aucune valeur brute dans les composants. Tailwind pourra être ajouté en F1 comme consommateur des tokens.
+- **Conséquences** : Aucune valeur brute dans les composants. Exception documentée pour les attributs structurels SVG (viewBox, coordonnées géométriques, données de tracé) — voir `docs/DESIGN_SYSTEM.md`.
 
 ## [DECISION-007] Supabase uniquement en local pour F0
 
@@ -89,6 +91,17 @@
 - **Statut** : Acceptée
 - **Décideur** : Claude
 - **Contexte** : Aucune connexion à un projet Supabase distant autorisée en F0. Pas de `supabase link`.
-- **Décision** : Le schéma Supabase sera préparé en F1. F0 se contente du `.env.example` avec l'URL locale par défaut.
+- **Décision** : Le schéma Supabase sera préparé en F1. F0 se contente du `.env.example` avec des placeholders.
 - **Alternatives** : Initialiser Supabase maintenant (hors périmètre F0, risque de migration PROD).
 - **Conséquences** : Pas de client Supabase dans F0. Les imports seront ajoutés en F1.
+
+## [DECISION-008] Suppression de l'en-tête X-XSS-Protection
+
+- **Date** : 2026-08-31
+- **Lot** : F0-R1
+- **Statut** : Acceptée
+- **Décideur** : Claude (correction Codex review)
+- **Contexte** : L'en-tête `X-XSS-Protection: 1; mode=block` était présent dans `next.config.ts`. Les navigateurs modernes (Chrome, Firefox, Edge) ignorent cet en-tête ou l'ont retiré. Il peut introduire des vulnérabilités dans Internet Explorer 8 en permettant l'injection via les pages d'erreur XSS.
+- **Décision** : Retirer `X-XSS-Protection` des en-têtes HTTP. La protection XSS repose sur la CSP (à implémenter dans un lot sécurité dédié) et le mode strict de React.
+- **Alternatives** : Conserver avec valeur `0` (désactivation explicite) — écarté, car un en-tête absent est plus propre qu'un en-tête désactivé.
+- **Conséquences** : En-têtes restants : `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`. CSP reportée à un lot dédié.

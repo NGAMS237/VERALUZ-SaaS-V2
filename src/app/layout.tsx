@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     template: "%s | VERALUZ",
   },
   description:
-    "VERALUZ SaaS V2 — Plateforme multi-tenant de gestion résidentielle. En cours de construction.",
+    "VERALUZ SaaS V2 — Plateforme multi-tenant pour résidences et établissements d'hébergement. En cours de construction.",
   robots: {
     index: false,
     follow: false,
