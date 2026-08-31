@@ -79,9 +79,12 @@ distant n'a pas pu être vérifié. Aucun PAT ne doit être demandé ou communiq
 
 **READY FOR CLAUDE REVIEW : OUI**
 
-La revue Claude doit porter sur le delta :
+La revue Claude doit porter sur le delta complet entre la source F0-R1 et le
+HEAD livré de `codex/f0-r1-review-fixes`. Le commit de code validé est inclus
+dans ce delta :
 
 ```text
-1651c5f7c40eb5b6ee8b1d9a63bae4b00f7183ba
-..f36bdbc7dc16c272e1e5bb82707c81f0fc75ad56
+source : 1651c5f7c40eb5b6ee8b1d9a63bae4b00f7183ba
+code   : f36bdbc7dc16c272e1e5bb82707c81f0fc75ad56
+final  : HEAD de codex/f0-r1-review-fixes (handoff inclus)
 ```
