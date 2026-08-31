@@ -8,6 +8,8 @@
  * Reference: https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation
  */
 export async function register(): Promise<void> {
+  // Framework exception: NEXT_RUNTIME is not application configuration.
+  // It is the only process.env access allowed outside lib/config/env.ts.
   // Only validate in the Node.js runtime.
   // The Edge runtime does not support all Node.js APIs and has no
   // server-only env vars — skip validation there.

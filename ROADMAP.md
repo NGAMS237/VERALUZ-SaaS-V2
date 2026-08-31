@@ -104,7 +104,7 @@ Audit
 - [x] `GET /api/kjemo/v1/health/live` (toujours 200 — liveness)
 - [x] `GET /api/kjemo/v1/health/ready` (200/503 — readiness)
 - [x] `.env.example` sans secret
-- [x] Validation Zod 3.x stricte (`FEATURE_MAINTENANCE` : enum `"true"|"false"` uniquement)
+- [x] Validation Zod 3.x stricte (`APP_ENV` obligatoire ; `FEATURE_MAINTENANCE` : enum `"true"|"false"`)
 - [x] Page minimale honnête "En construction"
 - [x] CI GitHub Actions (actions pinnées aux SHA)
 - [x] `src/instrumentation.ts` — validation env au démarrage serveur

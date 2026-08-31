@@ -57,17 +57,17 @@ jobs:
       - name: Unit tests with coverage
         run: pnpm test:coverage
         env:
-          NEXT_PUBLIC_APP_ENV: test
+          APP_ENV: test
           NEXT_PUBLIC_TENANT_ID: ci-tenant
-          NEXT_PUBLIC_FEATURE_MAINTENANCE: "false"
+          FEATURE_MAINTENANCE: "false"
           NODE_ENV: test
 
       - name: Build (production)
         run: pnpm build
         env:
-          NEXT_PUBLIC_APP_ENV: production
+          APP_ENV: production
           NEXT_PUBLIC_TENANT_ID: ci-tenant
-          NEXT_PUBLIC_FEATURE_MAINTENANCE: "false"
+          FEATURE_MAINTENANCE: "false"
           NODE_ENV: production
 
       - name: Audit dependencies

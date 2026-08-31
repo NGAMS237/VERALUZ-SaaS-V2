@@ -14,7 +14,7 @@ import { env } from "@/lib/config/env";
  * not the moment of the HTTP request.
  */
 export const dynamic = "force-static";
-export const revalidate = 60;
+export const revalidate = false;
 
 export interface ManifestResponse {
   name: string;

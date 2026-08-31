@@ -87,7 +87,8 @@ un besoin runtime de résolution de tenant le justifie.
 - **Règle absolue** : aucun secret dans le dépôt
 - Fichier `.env.local` exclu via `.gitignore`
 - Validation Zod stricte au démarrage (`src/lib/config/env.ts`)
-- `NEXT_PUBLIC_FEATURE_MAINTENANCE` : seulement `"true"` ou `"false"` — valeurs
+- `APP_ENV` : variable serveur obligatoire ; une absence bloque le démarrage
+- `FEATURE_MAINTENANCE` : variable serveur, seulement `"true"` ou `"false"` — valeurs
   ambiguës comme `"True"`, `"yes"`, `"1"` sont rejetées avec erreur explicite
 - Variables `NEXT_PUBLIC_*` : non-secrètes par construction (bundlées côté client)
 
@@ -97,12 +98,12 @@ Pipeline CI avec gitleaks sur chaque push (action pinnée au SHA).
 
 ## Plan de sécurité par lot
 
-| Lot | Sécurité implémentée                                |
-| --- | --------------------------------------------------- |
-| F0  | En-têtes HTTP, validation env stricte, scan CI      |
-| F1  | Supabase Auth, RLS + memberships, résolution tenant |
-| F2  | Audit logs, permissions granulaires                 |
-| F3  | Chiffrement données sensibles                       |
+| Lot | Sécurité implémentée                             |
+| --- | ------------------------------------------------ |
+| F0  | En-têtes HTTP, validation env stricte, scan CI   |
+| F1  | Supabase local, Auth, RLS, memberships et tenant |
+| F1+ | Audit logs et permissions selon les modules      |
+| GA  | Revue conformité, secrets et production          |
 
 ## Décisions régionales et réglementaires
 

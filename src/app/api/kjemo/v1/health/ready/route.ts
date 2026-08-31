@@ -24,7 +24,7 @@ export interface HealthReadyResponse {
 }
 
 export function GET(_req: NextRequest): NextResponse<HealthReadyResponse> {
-  const inMaintenance = env.NEXT_PUBLIC_FEATURE_MAINTENANCE;
+  const inMaintenance = env.FEATURE_MAINTENANCE;
 
   if (inMaintenance) {
     return NextResponse.json(

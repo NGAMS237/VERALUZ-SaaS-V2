@@ -10,18 +10,18 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
  * - Returns a valid ISO 8601 timestamp and non-negative integer uptime
  */
 describe("GET /api/kjemo/v1/health/live", () => {
-  const savedMaintenance = process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"];
+  const savedMaintenance = process.env["FEATURE_MAINTENANCE"];
 
   afterEach(() => {
     if (savedMaintenance !== undefined) {
-      process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = savedMaintenance;
+      process.env["FEATURE_MAINTENANCE"] = savedMaintenance;
     } else {
-      delete process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"];
+      delete process.env["FEATURE_MAINTENANCE"];
     }
   });
 
   beforeEach(() => {
-    process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = "false";
+    process.env["FEATURE_MAINTENANCE"] = "false";
   });
 
   it("returns 200 with status ok when not in maintenance", async () => {
@@ -37,7 +37,7 @@ describe("GET /api/kjemo/v1/health/live", () => {
 
   it("returns 200 with status ok even when FEATURE_MAINTENANCE is true", async () => {
     // Liveness must NOT return 503 for maintenance — only readiness does.
-    process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = "true";
+    process.env["FEATURE_MAINTENANCE"] = "true";
     const { GET } = await import("@/app/api/kjemo/v1/health/live/route");
 
     const mockReq = new Request("http://localhost:3000/api/kjemo/v1/health/live");

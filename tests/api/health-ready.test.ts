@@ -18,24 +18,24 @@ describe("GET /api/kjemo/v1/health/ready", () => {
 
   beforeEach(() => {
     // Snapshot current env
-    savedEnv["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"];
-    process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = "false";
+    savedEnv["FEATURE_MAINTENANCE"] = process.env["FEATURE_MAINTENANCE"];
+    process.env["FEATURE_MAINTENANCE"] = "false";
     // Reset module cache so env.ts re-evaluates with current process.env
     vi.resetModules();
   });
 
   afterEach(() => {
-    const saved = savedEnv["NEXT_PUBLIC_FEATURE_MAINTENANCE"];
+    const saved = savedEnv["FEATURE_MAINTENANCE"];
     if (saved !== undefined) {
-      process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = saved;
+      process.env["FEATURE_MAINTENANCE"] = saved;
     } else {
-      delete process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"];
+      delete process.env["FEATURE_MAINTENANCE"];
     }
     vi.resetModules();
   });
 
   it("returns 200 with status ready when not in maintenance", async () => {
-    process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = "false";
+    process.env["FEATURE_MAINTENANCE"] = "false";
     vi.resetModules();
     const { GET } = await import("@/app/api/kjemo/v1/health/ready/route");
 
@@ -48,7 +48,7 @@ describe("GET /api/kjemo/v1/health/ready", () => {
   });
 
   it("returns 503 with status unavailable when FEATURE_MAINTENANCE is true", async () => {
-    process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = "true";
+    process.env["FEATURE_MAINTENANCE"] = "true";
     vi.resetModules();
     const { GET } = await import("@/app/api/kjemo/v1/health/ready/route");
 
@@ -98,7 +98,7 @@ describe("GET /api/kjemo/v1/health/ready", () => {
   });
 
   it("returns expected JSON shape in maintenance state", async () => {
-    process.env["NEXT_PUBLIC_FEATURE_MAINTENANCE"] = "true";
+    process.env["FEATURE_MAINTENANCE"] = "true";
     vi.resetModules();
     const { GET } = await import("@/app/api/kjemo/v1/health/ready/route");
 

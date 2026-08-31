@@ -10,7 +10,7 @@ Toute duplication doit être éliminée au profit d'une référence.
 | Domaine                        | SSOT                           | Consommateurs               |
 | ------------------------------ | ------------------------------ | --------------------------- |
 | Tokens visuels                 | `src/styles/tokens.css`        | Tous les composants CSS     |
-| Variables d'environnement      | `src/lib/config/env.ts`        | Tout le code serveur        |
+| Variables applicatives         | `src/lib/config/env.ts`        | Tout le code serveur        |
 | Schéma des env vars            | `src/lib/config/env.schema.ts` | `env.ts`, tests             |
 | Version applicative            | `package.json#version`         | `src/lib/config/version.ts` |
 | Versions des dépendances       | `package.json`                 | `pnpm-lock.yaml`, CI        |

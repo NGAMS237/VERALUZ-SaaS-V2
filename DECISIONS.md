@@ -58,7 +58,10 @@
 - **Contexte** : Les variables d'environnement manquantes ou malformées causent des bugs silencieux en production.
 - **Décision** : Zod 3.24.4 avec `safeParse` au démarrage, échec rapide si invalide. Versions exactes dans `package.json`.
 - **Alternatives** : t3-env (dépendance additionnelle), validation manuelle (fragile).
-- **Conséquences** : `src/lib/config/env.ts` est le seul point d'accès aux env vars côté serveur. `FEATURE_MAINTENANCE` utilise un enum strict — `"True"`, `"yes"`, `"1"` sont rejetés.
+- **Conséquences** : `src/lib/config/env.ts` est le seul point d'accès aux valeurs
+  applicatives. `APP_ENV` est obligatoire. `FEATURE_MAINTENANCE` est serveur uniquement
+  et utilise un enum strict — `"True"`, `"yes"`, `"1"` sont rejetés. La sentinelle
+  framework `NEXT_RUNTIME` dans `src/instrumentation.ts` est l'unique exception.
 
 Note : Zod 4.x n'a pas été retenu en F0 car il était trop récent au moment du développement (politique supply-chain minimumReleaseAge).
 

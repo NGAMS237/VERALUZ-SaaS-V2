@@ -34,7 +34,7 @@ node -v && pnpm -v
 
 # 2. Variables d'environnement
 cp .env.example .env.local
-# Remplir les valeurs dans .env.local
+# APP_ENV est obligatoire ; remplir les valeurs dans .env.local
 
 # 3. Dépendances
 pnpm install
@@ -67,7 +67,8 @@ pnpm dev
 
 ## Conventions
 
-- Variables d'environnement via `src/lib/config/env.ts` uniquement
+- Variables applicatives via `src/lib/config/env.ts` uniquement
+- Exception framework documentée : `NEXT_RUNTIME` dans `src/instrumentation.ts`
 - `FEATURE_MAINTENANCE` accepte seulement `"true"` ou `"false"` — pas de coercition silencieuse
 - Version applicative depuis `package.json#version` via `src/lib/config/version.ts`
 - Tokens CSS `--vlz-*` pour toutes les valeurs visuelles

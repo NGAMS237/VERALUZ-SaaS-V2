@@ -15,7 +15,7 @@ Voir `package.json` pour les versions exactes verrouillées.
 | Langage         | TypeScript strict     | v5.x — TS 7.x incompatible   |
 | Runtime         | Node.js               | v22.23.2 (LTS)               |
 | Package manager | pnpm                  | v11.24.0                     |
-| Base de données | Supabase (PostgreSQL) | local en F0, distant en F1+  |
+| Base de données | Supabase (PostgreSQL) | absent en F0, local en F1+   |
 | Tests           | Vitest                | v4.x                         |
 | Validation      | Zod                   | v3.x (3.x stable, 4.x futur) |
 
@@ -72,7 +72,7 @@ Transport HTTP
 
 Configuration
 └── src/lib/config/
-    └── seule frontière autorisée pour process.env
+    └── seule frontière autorisée pour les valeurs de configuration
 
 Métier
 └── src/modules/
@@ -117,7 +117,9 @@ Le premier tenant pilote est `veraluz-001` (La Résidence VERALUZ).
 
 - En-têtes HTTP configurés dans `next.config.ts` (voir `DECISIONS.md`)
 - Variables sensibles jamais dans le bundle client
-- `src/lib/config/env.ts` — seule frontière pour `process.env` dans l'application
+- `src/lib/config/env.ts` — seule frontière pour les valeurs de configuration
+- Exception framework : `src/instrumentation.ts` peut lire uniquement
+  `process.env.NEXT_RUNTIME` pour sélectionner le runtime Next.js
 - Validation Zod stricte : `FEATURE_MAINTENANCE` accepte seulement `"true"` ou `"false"`
 - RLS Supabase pour l'isolation des données (F1+)
 - Secret scanning en CI via gitleaks (action pinnée au SHA)

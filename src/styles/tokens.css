@@ -91,19 +91,19 @@
   /* ── Layout ── */
   --vlz-container-max: 1280px;
   --vlz-sidebar-width: 256px;
+
+  /* ── Viewport ── */
+  --vlz-viewport-min-full: 100dvh; /* full viewport height (dynamic) */
+
+  /* ── Content widths ── */
+  --vlz-content-max-prose: 30rem; /* 480px — max-width for readable prose */
+
+  /* ── Letter spacing ── */
+  --vlz-letter-spacing-wide: 0.1em; /* wide tracking for labels */
+
+  /* ── Shape ── */
+  --vlz-radius-circle: 50%; /* perfect circle for status indicators */
+
+  /* ── Icon sizes ── */
+  --vlz-icon-size-wordmark: 3rem; /* 48px — wordmark SVG rendered size */
 }
-
-/* ── Viewport ── */
---vlz-viewport-min-full: 100dvh; /* full viewport height (dynamic) */
-
-/* ── Content widths ── */
---vlz-content-max-prose: 30rem; /* 480px — max-width for readable prose */
-
-/* ── Letter spacing ── */
---vlz-letter-spacing-wide: 0.1em; /* wide tracking for labels */
-
-/* ── Shape ── */
---vlz-radius-circle: 50%; /* perfect circle for status indicators */
-
-/* ── Icon sizes ── */
---vlz-icon-size-wordmark: 3rem; /* 48px — wordmark SVG rendered size */

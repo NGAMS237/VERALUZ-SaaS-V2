@@ -11,7 +11,7 @@ import { fullEnvSchema, type FullEnv } from "./env.schema";
  *
  * @example
  * import { env } from "@/lib/config/env";
- * if (env.NEXT_PUBLIC_FEATURE_MAINTENANCE) { ... }
+ * if (env.FEATURE_MAINTENANCE) { ... }
  */
 export function validateEnv(): FullEnv {
   const result = fullEnvSchema.safeParse(process.env);

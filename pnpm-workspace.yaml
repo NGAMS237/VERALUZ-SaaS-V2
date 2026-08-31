@@ -1,2 +1,10 @@
 packages:
   - "."
+
+# Reject dependency releases younger than 24 hours.
+minimumReleaseAge: 1440
+
+# Reviewed install scripts required by the pinned toolchain.
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true

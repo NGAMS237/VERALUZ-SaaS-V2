@@ -14,7 +14,8 @@ Vérifier la conformité architecturale du code VERALUZ SaaS V2 avant tout commi
 
 - [ ] Aucun import depuis `veraluz-os`
 - [ ] Aucun secret commité (clés, tokens, passwords dans les fichiers)
-- [ ] Aucun accès direct à `process.env` hors de `src/lib/config/env.ts`
+- [ ] Aucun accès direct à `process.env` hors de `src/lib/config/env.ts`, sauf
+      `process.env.NEXT_RUNTIME` dans `src/instrumentation.ts` (sentinelle framework Next.js)
 - [ ] Aucune valeur CSS brute dans `src/app`, `src/components`, `src/modules`
 - [ ] Aucun fichier Supabase (client, migrations, seeds) en F0
 - [ ] Aucun push vers `main`
@@ -28,7 +29,8 @@ Vérifier la conformité architecturale du code VERALUZ SaaS V2 avant tout commi
 - [ ] Les nouveaux endpoints API sont sous `/api/kjemo/v1/`
 - [ ] Les tests sont dans `tests/` avec Vitest
 - [ ] Le lockfile `pnpm-lock.yaml` est commité
-- [ ] `minimumReleaseAge` ≥ 1440 dans `.npmrc`
+- [ ] `minimumReleaseAge` ≥ 1440 dans `pnpm-workspace.yaml`
+- [ ] Chaque script d'installation autorisé est déclaré dans `allowBuilds`
 
 ### ✅ Qualité avant commit
 
@@ -50,9 +52,8 @@ rg "veraluz-os" src/ --type ts --type tsx -l 2>/dev/null || \
 # 2. Chercher des accès directs à process.env hors de la frontière config
 # Détecte les 3 formes : process.env.X, process.env["X"], process.env['X']
 rg 'process\.env(\.|(\[["'"'"']))' src/ --type ts --type tsx \
-  --glob '!src/lib/config/**' -n 2>/dev/null || \
-  grep -rn "process\.env" src/ --include="*.ts" --include="*.tsx" \
-  | grep -v "src/lib/config/"
+  --glob '!src/lib/config/**' -n 2>/dev/null \
+  | grep -v 'src/instrumentation.ts:.*process.env.NEXT_RUNTIME'
 
 # 3. Chercher des valeurs CSS brutes dans les composants
 # Détecte: px, dvh, em, rem, %, vh, vw inline (hors exceptions SVG structurelles)
@@ -72,8 +73,9 @@ git ls-files | grep -E "^\.env($|\.|local|production|staging)"
 # 6. Chercher des références à veraluz-os ou KJORA/KJEMO dans les fichiers source
 rg "veraluz-os|KJORA|KAJORA" src/ --type ts --type tsx -l 2>/dev/null
 
-# 7. Vérifier minimumReleaseAge dans .npmrc
-grep "minimumReleaseAge=0" .npmrc && echo "VIOLATION: minimumReleaseAge=0 détecté" || echo "OK"
+# 7. Vérifier la politique supply-chain pnpm 11
+rg '^minimumReleaseAge: 1440$' pnpm-workspace.yaml
+rg -A 2 '^allowBuilds:' pnpm-workspace.yaml
 
 # 8. Vérifier les whitespace errors dans le delta commité
 git diff --check "$(git merge-base HEAD origin/claude/f0-foundation-bootstrap 2>/dev/null || git rev-list --max-parents=0 HEAD)" HEAD
