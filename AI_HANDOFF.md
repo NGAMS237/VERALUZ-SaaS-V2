@@ -252,17 +252,19 @@ pnpm audit
 
 ### Base de données (migration `20260901100000_create_room_inventory_schema.sql`)
 
-| Table | Points clés |
-|-------|-------------|
-| `room_categories` | UNIQUE (tenant_id, code), CHECK occupancy coherence (max_occupancy ≥ base_occupancy, max_adults ≤ max_occupancy) |
-| `rooms` | ENUM `room_operational_status` (active/inactive/out_of_service), CHECK cross-tenant FK via sous-requête |
-| `tenant_operational_settings` | PK = tenant_id (1 ligne par tenant), check_out_time DEFAULT '12:00' |
-| RLS | ENABLE FORCE sur les 3 tables ; SELECT pour membres authentifiés ; INSERT/UPDATE pour owner/admin avec WITH CHECK tenant_id immuable ; REVOKE ALL → GRANT SELECT,INSERT,UPDATE TO authenticated |
+| Table                         | Points clés                                                                                                                                                                                     |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `room_categories`             | UNIQUE (tenant_id, code), CHECK occupancy coherence (max_occupancy ≥ base_occupancy, max_adults ≤ max_occupancy)                                                                                |
+| `rooms`                       | ENUM `room_operational_status` (active/inactive/out_of_service), CHECK cross-tenant FK via sous-requête                                                                                         |
+| `tenant_operational_settings` | PK = tenant_id (1 ligne par tenant), check_out_time DEFAULT '12:00'                                                                                                                             |
+| RLS                           | ENABLE FORCE sur les 3 tables ; SELECT pour membres authentifiés ; INSERT/UPDATE pour owner/admin avec WITH CHECK tenant_id immuable ; REVOKE ALL → GRANT SELECT,INSERT,UPDATE TO authenticated |
 
 ### pgTAP (`supabase/tests/02_rls_room_inventory.test.sql`)
+
 - **40 assertions** : existence tables, RLS activé, FK, indexes, contraintes UNIQUE, rejet cross-tenant, CHECK occupancy, anon refusé, DELETE refusé, unicité settings
 
 ### TypeScript domain layer
+
 - `src/modules/rooms/domain/types.ts` — interfaces + 7 classes d'erreur
 - `src/modules/rooms/domain/validators.ts` — Zod avec `exactOptionalPropertyTypes`
 - `src/modules/rooms/services/room-category.service.ts` — CRUD + cohérence occupancy
@@ -272,6 +274,7 @@ pnpm audit
 - Persistence Supabase typée (pas de `Record<string,unknown>`)
 
 ### Route Handlers (7 routes sous `/api/kjemo/v1/t/[tenantSlug]/`)
+
 - `GET/POST /room-categories`
 - `GET/PATCH /room-categories/[categoryId]`
 - `PATCH /room-categories/[categoryId]/active`
@@ -282,6 +285,7 @@ pnpm audit
 - `src/lib/api/response.ts` — `ok()`, `created()`, `handleError()` avec mapping complet
 
 ### Tests TypeScript — 148 tests, 0 échec
+
 - Couverture : **94.66% stmts / 90% branches / 100% funcs / 96.23% lines** (seuil 80%)
 - `tests/api/core1/` — 6 fichiers route handlers
 - `tests/lib/response.test.ts` — 13 tests handleError
@@ -290,14 +294,14 @@ pnpm audit
 
 ## Résultats de validation
 
-| Étape | Résultat |
-|-------|----------|
-| `tsc --noEmit` | ✅ 0 erreur |
-| `eslint src` | ✅ 0 avertissement |
-| `next build` | ✅ succès |
-| `vitest run` | ✅ 148/148 |
-| `vitest run --coverage` | ✅ ≥ 80% toutes métriques |
-| pgTAP (Docker requis) | ⏳ non exécuté localement (Docker absent en CI sandbox) |
+| Étape                   | Résultat                                                |
+| ----------------------- | ------------------------------------------------------- |
+| `tsc --noEmit`          | ✅ 0 erreur                                             |
+| `eslint src`            | ✅ 0 avertissement                                      |
+| `next build`            | ✅ succès                                               |
+| `vitest run`            | ✅ 148/148                                              |
+| `vitest run --coverage` | ✅ ≥ 80% toutes métriques                               |
+| pgTAP (Docker requis)   | ⏳ non exécuté localement (Docker absent en CI sandbox) |
 
 ## Décisions techniques notables
 
