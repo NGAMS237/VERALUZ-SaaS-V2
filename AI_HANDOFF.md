@@ -88,3 +88,79 @@ source : 1651c5f7c40eb5b6ee8b1d9a63bae4b00f7183ba
 code   : f36bdbc7dc16c272e1e5bb82707c81f0fc75ad56
 final  : HEAD de codex/f0-r1-review-fixes (handoff inclus)
 ```
+
+---
+
+# AI_HANDOFF — F1 Identité, tenant et authentification
+
+## Statut
+
+- **Projet** : VERALUZ SaaS V2
+- **Lot** : F1 — identité multi-tenant + authentification Supabase Auth
+- **Branche** : `claude/f1-identity-tenant-auth`
+- **Implémenteur** : Claude (gouvernance F1 révisée par Blaise)
+- **Réviseur attendu** : Codex
+- **Date** : 2026-08-31
+
+## SHA des commits F1
+
+| SHA       | Message                                                          |
+| --------- | ---------------------------------------------------------------- |
+| `76bc62f` | feat(f1): init supabase local + migration multi-tenant + RLS    |
+| `f25741f` | feat(f1): clients Supabase typés + variables env + types DB     |
+| `34951c9` | feat(f1): proxy Next.js 16 + résolution tenant                  |
+| `3e4c9db` | feat(f1): routing /t/[tenantSlug] + login/logout UI + API       |
+| `3488b89` | test(f1): tests Vitest clients Supabase, resolver, env, logout  |
+| `7028b15` | chore(f1): CI + env.example + package.json + fix build          |
+
+## Résultats de validation
+
+| Vérification          | Résultat                                           |
+| --------------------- | -------------------------------------------------- |
+| `pnpm format:check`   | ✅ PASS — 0 erreur                                 |
+| `pnpm lint`           | ✅ PASS — 0 warning                                |
+| `pnpm typecheck`      | ✅ PASS — 0 erreur                                 |
+| `pnpm test`           | ✅ PASS — 58/58 tests                              |
+| `pnpm test:coverage`  | ✅ PASS — 90.9 % stmts, 100 % branches, 80 % fns  |
+| `pnpm build`          | ✅ PASS (avec APP_ENV=production)                  |
+| `git diff --check`    | ✅ PASS — 0 espace de fin                          |
+| Scan secrets          | ✅ PASS — 0 secret détecté                         |
+| pgTAP RLS (local)     | ⚠️ Non exécuté (Docker indisponible en sandbox)   |
+
+### Note pgTAP
+Les 24 tests pgTAP sont écrits dans `supabase/tests/01_rls_tenant_isolation.test.sql`.
+Le job CI `supabase-local` les exécutera automatiquement sur GitHub Actions (Docker disponible).
+Codex peut les valider en local avec : `supabase start && supabase test db`
+
+## Décisions techniques F1
+
+| Décision | Choix | Raison |
+| --- | --- | --- |
+| Naming clé publique | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Convention Supabase 2025+ (pas ANON_KEY) |
+| Session server-side | `getClaims()` uniquement | Jamais `getSession()` côté serveur (vulnérabilité) |
+| Middleware Next.js 16 | `src/proxy.ts` | Next.js 16 n'utilise plus `middleware.ts` |
+| Params async App Router | `params: Promise<{...}>` | Obligatoire en Next.js 16 |
+| redirect() type | `as any` cast | Next.js 16 RouteImpl — chemin dynamique non statiquement connu |
+| ENUM role | PostgreSQL ENUM | Cohérence DB, pas CHECK TEXT |
+| Schema private | SECURITY DEFINER functions | Isoler triggers et helpers des rôles publics |
+
+## Périmètre respecté
+
+- ✅ Aucun import depuis `NGAMS237/veraluz-os`
+- ✅ Aucune migration distante / `supabase link` / `supabase db push`
+- ✅ Aucun secret dans les commits, logs ou fichiers
+- ✅ Aucun push direct vers `main`
+- ✅ Aucun module métier (réservations, chambres, séjour)
+- ✅ Aucun développement F1-v3.1 / KJORA / KAJORA / KJEMO Studios
+- ✅ Aucun email Resend; aucun appel HyperFrames
+
+## Commande de démarrage pour Codex (revue)
+
+```bash
+git fetch origin claude/f1-identity-tenant-auth
+git checkout claude/f1-identity-tenant-auth
+# Lire AI_HANDOFF.md section F1
+pnpm install && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:coverage && APP_ENV=production NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=test pnpm build
+# Optionnel — pgTAP si Docker disponible :
+# supabase start && supabase test db
+```
