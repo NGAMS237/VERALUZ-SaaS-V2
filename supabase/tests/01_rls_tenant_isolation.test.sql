@@ -6,7 +6,7 @@
 
 BEGIN;
 
-SELECT plan(24);
+SELECT plan(23);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- FIXTURES
@@ -50,17 +50,26 @@ SELECT has_table('public', 'memberships', 'Table public.memberships existe');
 -- TEST 2 : RLS activé
 -- ─────────────────────────────────────────────────────────────────────────────
 
-SELECT has_row_security('public', 'tenants',     'RLS activé sur tenants');
-SELECT has_row_security('public', 'users',       'RLS activé sur users');
-SELECT has_row_security('public', 'memberships', 'RLS activé sur memberships');
+SELECT ok(has_row_security('public', 'tenants'),     'RLS activé sur tenants');
+SELECT ok(has_row_security('public', 'users'),       'RLS activé sur users');
+SELECT ok(has_row_security('public', 'memberships'), 'RLS activé sur memberships');
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- TEST 3 : Policies existent
 -- ─────────────────────────────────────────────────────────────────────────────
 
-SELECT policy_cmd_is('public', 'tenants',     'tenants_select_members_only', 'SELECT', 'Policy SELECT sur tenants');
-SELECT policy_cmd_is('public', 'users',       'users_select_own_profile',    'SELECT', 'Policy SELECT sur users');
-SELECT policy_cmd_is('public', 'memberships', 'memberships_select_own',      'SELECT', 'Policy SELECT sur memberships');
+SELECT ok(
+  EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='tenants'
+          AND policyname='tenants_select_members_only' AND cmd='SELECT'),
+  'Policy SELECT sur tenants');
+SELECT ok(
+  EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='users'
+          AND policyname='users_select_own_profile' AND cmd='SELECT'),
+  'Policy SELECT sur users');
+SELECT ok(
+  EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='memberships'
+          AND policyname='memberships_select_own' AND cmd='SELECT'),
+  'Policy SELECT sur memberships');
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- TEST 4 : anonyme — aucun accès
