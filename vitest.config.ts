@@ -19,6 +19,8 @@ export default defineConfig({
         "tests",
         // Exclude type-only files and barrel re-exports
         "**/*.d.ts",
+        // database.types.ts is a pure type file — no executable runtime code
+        "src/lib/database.types.ts",
       ],
       thresholds: {
         lines: 80,
