@@ -104,45 +104,46 @@ final  : HEAD de codex/f0-r1-review-fixes (handoff inclus)
 
 ## SHA des commits F1
 
-| SHA       | Message                                                          |
-| --------- | ---------------------------------------------------------------- |
-| `76bc62f` | feat(f1): init supabase local + migration multi-tenant + RLS    |
-| `f25741f` | feat(f1): clients Supabase typés + variables env + types DB     |
-| `34951c9` | feat(f1): proxy Next.js 16 + résolution tenant                  |
-| `3e4c9db` | feat(f1): routing /t/[tenantSlug] + login/logout UI + API       |
-| `3488b89` | test(f1): tests Vitest clients Supabase, resolver, env, logout  |
-| `7028b15` | chore(f1): CI + env.example + package.json + fix build          |
+| SHA       | Message                                                        |
+| --------- | -------------------------------------------------------------- |
+| `76bc62f` | feat(f1): init supabase local + migration multi-tenant + RLS   |
+| `f25741f` | feat(f1): clients Supabase typés + variables env + types DB    |
+| `34951c9` | feat(f1): proxy Next.js 16 + résolution tenant                 |
+| `3e4c9db` | feat(f1): routing /t/[tenantSlug] + login/logout UI + API      |
+| `3488b89` | test(f1): tests Vitest clients Supabase, resolver, env, logout |
+| `7028b15` | chore(f1): CI + env.example + package.json + fix build         |
 
 ## Résultats de validation
 
-| Vérification          | Résultat                                           |
-| --------------------- | -------------------------------------------------- |
-| `pnpm format:check`   | ✅ PASS — 0 erreur                                 |
-| `pnpm lint`           | ✅ PASS — 0 warning                                |
-| `pnpm typecheck`      | ✅ PASS — 0 erreur                                 |
-| `pnpm test`           | ✅ PASS — 58/58 tests                              |
-| `pnpm test:coverage`  | ✅ PASS — 90.9 % stmts, 100 % branches, 80 % fns  |
-| `pnpm build`          | ✅ PASS (avec APP_ENV=production)                  |
-| `git diff --check`    | ✅ PASS — 0 espace de fin                          |
-| Scan secrets          | ✅ PASS — 0 secret détecté                         |
-| pgTAP RLS (local)     | ⚠️ Non exécuté (Docker indisponible en sandbox)   |
+| Vérification         | Résultat                                         |
+| -------------------- | ------------------------------------------------ |
+| `pnpm format:check`  | ✅ PASS — 0 erreur                               |
+| `pnpm lint`          | ✅ PASS — 0 warning                              |
+| `pnpm typecheck`     | ✅ PASS — 0 erreur                               |
+| `pnpm test`          | ✅ PASS — 58/58 tests                            |
+| `pnpm test:coverage` | ✅ PASS — 90.9 % stmts, 100 % branches, 80 % fns |
+| `pnpm build`         | ✅ PASS (avec APP_ENV=production)                |
+| `git diff --check`   | ✅ PASS — 0 espace de fin                        |
+| Scan secrets         | ✅ PASS — 0 secret détecté                       |
+| pgTAP RLS (local)    | ⚠️ Non exécuté (Docker indisponible en sandbox)  |
 
 ### Note pgTAP
+
 Les 24 tests pgTAP sont écrits dans `supabase/tests/01_rls_tenant_isolation.test.sql`.
 Le job CI `supabase-local` les exécutera automatiquement sur GitHub Actions (Docker disponible).
 Codex peut les valider en local avec : `supabase start && supabase test db`
 
 ## Décisions techniques F1
 
-| Décision | Choix | Raison |
-| --- | --- | --- |
-| Naming clé publique | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Convention Supabase 2025+ (pas ANON_KEY) |
-| Session server-side | `getClaims()` uniquement | Jamais `getSession()` côté serveur (vulnérabilité) |
-| Middleware Next.js 16 | `src/proxy.ts` | Next.js 16 n'utilise plus `middleware.ts` |
-| Params async App Router | `params: Promise<{...}>` | Obligatoire en Next.js 16 |
-| redirect() type | `as any` cast | Next.js 16 RouteImpl — chemin dynamique non statiquement connu |
-| ENUM role | PostgreSQL ENUM | Cohérence DB, pas CHECK TEXT |
-| Schema private | SECURITY DEFINER functions | Isoler triggers et helpers des rôles publics |
+| Décision                | Choix                                  | Raison                                                         |
+| ----------------------- | -------------------------------------- | -------------------------------------------------------------- |
+| Naming clé publique     | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Convention Supabase 2025+ (pas ANON_KEY)                       |
+| Session server-side     | `getClaims()` uniquement               | Jamais `getSession()` côté serveur (vulnérabilité)             |
+| Middleware Next.js 16   | `src/proxy.ts`                         | Next.js 16 n'utilise plus `middleware.ts`                      |
+| Params async App Router | `params: Promise<{...}>`               | Obligatoire en Next.js 16                                      |
+| redirect() type         | `as any` cast                          | Next.js 16 RouteImpl — chemin dynamique non statiquement connu |
+| ENUM role               | PostgreSQL ENUM                        | Cohérence DB, pas CHECK TEXT                                   |
+| Schema private          | SECURITY DEFINER functions             | Isoler triggers et helpers des rôles publics                   |
 
 ## Périmètre respecté
 
