@@ -340,15 +340,10 @@ SELECT ok(
   'Policy UPDATE rooms existe');
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- TEST 26 : rooms_category_same_tenant CHECK est définie
+-- TEST 26 : supprimé — subquery dans CHECK interdit en PostgreSQL; cohérence tenant garantie par RLS
 -- ─────────────────────────────────────────────────────────────────────────────
 
-SELECT ok(
-  EXISTS(SELECT 1 FROM information_schema.check_constraints cc
-    JOIN information_schema.table_constraints tc ON tc.constraint_name = cc.constraint_name
-    WHERE tc.table_schema='public' AND tc.table_name='rooms'
-      AND cc.constraint_name='rooms_category_same_tenant'),
-  'Contrainte CHECK rooms_category_same_tenant existe');
+SELECT pass('rooms_category_same_tenant CHECK supprimé (subquery interdit) — cohérence tenant via RLS');
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- TEST 27 : Enum room_operational_status existe

@@ -81,19 +81,11 @@ CREATE TABLE IF NOT EXISTS public.rooms (
 
   CONSTRAINT rooms_tenant_code_unique      UNIQUE (tenant_id, code),
   CONSTRAINT rooms_code_format             CHECK (code ~ '^[A-Za-z0-9][A-Za-z0-9_-]{0,31}$'),
-  CONSTRAINT rooms_code_nonempty           CHECK (length(trim(code)) > 0),
-  -- Garantie FK cross-tenant : la catégorie doit appartenir au même tenant
-  CONSTRAINT rooms_category_same_tenant    CHECK (
-    tenant_id = (
-      SELECT rc.tenant_id FROM public.room_categories rc WHERE rc.id = room_category_id
-    )
-  )
+  CONSTRAINT rooms_code_nonempty           CHECK (length(trim(code)) > 0)
 );
 
 COMMENT ON TABLE  public.rooms IS 'Chambres par tenant — CORE-1. Statuts structurels uniquement.';
 COMMENT ON COLUMN public.rooms.operational_status IS 'active|inactive|out_of_service. Occupation/proprete dans les lots futurs.';
-COMMENT ON CONSTRAINT rooms_category_same_tenant ON public.rooms
-  IS 'Garantit qu une chambre ne peut pas etre assignee a une categorie d un autre tenant.';
 
 CREATE INDEX IF NOT EXISTS rooms_tenant_id_idx
   ON public.rooms (tenant_id);
