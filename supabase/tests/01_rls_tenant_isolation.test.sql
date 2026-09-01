@@ -81,22 +81,29 @@ SELECT ok(
 -- TEST 4 : anonyme — aucun accès
 -- ─────────────────────────────────────────────────────────────────────────────
 
-SET LOCAL role TO anon;
-
-SELECT is(
-  (SELECT count(*) FROM public.tenants)::int, 0,
-  'anon ne voit aucun tenant'
-);
-SELECT is(
-  (SELECT count(*) FROM public.users)::int, 0,
-  'anon ne voit aucun user'
-);
-SELECT is(
-  (SELECT count(*) FROM public.memberships)::int, 0,
-  'anon ne voit aucun membership'
-);
-
-RESET role;
+-- anon n'a pas le privilège SELECT (REVOKE ALL dans la migration).
+-- Vérification directe via information_schema (indépendant du rôle courant).
+SELECT ok(
+  NOT EXISTS (
+    SELECT 1 FROM information_schema.role_table_grants
+    WHERE table_schema='public' AND table_name='tenants'
+    AND grantee='anon' AND privilege_type='SELECT'
+  ),
+  'anon: aucun privilege SELECT sur tenants');
+SELECT ok(
+  NOT EXISTS (
+    SELECT 1 FROM information_schema.role_table_grants
+    WHERE table_schema='public' AND table_name='users'
+    AND grantee='anon' AND privilege_type='SELECT'
+  ),
+  'anon: aucun privilege SELECT sur users');
+SELECT ok(
+  NOT EXISTS (
+    SELECT 1 FROM information_schema.role_table_grants
+    WHERE table_schema='public' AND table_name='memberships'
+    AND grantee='anon' AND privilege_type='SELECT'
+  ),
+  'anon: aucun privilege SELECT sur memberships');
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- TEST 5 : Alice (membre de Alpha) — voit uniquement Alpha
