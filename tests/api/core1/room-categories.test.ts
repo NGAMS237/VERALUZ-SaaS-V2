@@ -3,7 +3,7 @@
  * Tests route handlers CORE-1 — room-categories
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 const mockCategory = {
   id: "cat-1",
