@@ -8,6 +8,10 @@ import { z } from "zod";
  *       It never constitutes authorisation. Access control
  *       will be enforced via auth.uid() + memberships (F1+).
  *
+ * NOTE: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+ *       are non-secret by construction (bundled client-side by Next.js).
+ *       They are optional with local defaults to allow builds without a live
+ *       Supabase instance (e.g., CI build step, storybook).
  */
 export const publicEnvSchema = z.object({
   /**
@@ -15,6 +19,24 @@ export const publicEnvSchema = z.object({
    * Never use this value as an authorisation token.
    */
   NEXT_PUBLIC_TENANT_ID: z.string().optional().default(""),
+
+  /**
+   * Supabase project URL.
+   * Defaults to local Supabase stack (http://127.0.0.1:54321).
+   * Must be a valid URL when provided.
+   */
+  NEXT_PUBLIC_SUPABASE_URL: z
+    .string()
+    .url({ message: "NEXT_PUBLIC_SUPABASE_URL must be a valid URL when provided" })
+    .optional()
+    .default("http://127.0.0.1:54321"),
+
+  /**
+   * Supabase publishable (anon) key — safe to expose to the browser.
+   * Never use the service_role key here.
+   * Empty string is accepted in non-production environments (local dev, CI build).
+   */
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().optional().default(""),
 });
 
 /**

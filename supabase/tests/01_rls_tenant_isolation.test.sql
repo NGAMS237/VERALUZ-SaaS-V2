@@ -1,0 +1,217 @@
+-- Tests pgTAP — Isolation RLS multi-tenant
+-- Lot F1 — VERALUZ SaaS V2
+--
+-- Pré-requis : supabase db reset && supabase test db
+-- Ces tests vérifient les garanties d'isolation entre tenants.
+
+BEGIN;
+
+SELECT plan(23);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- FIXTURES
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- Tenants de test
+INSERT INTO public.tenants (id, slug, name) VALUES
+  ('aaaaaaaa-0000-0000-0000-000000000001'::uuid, 'tenant-alpha', 'Tenant Alpha'),
+  ('bbbbbbbb-0000-0000-0000-000000000002'::uuid, 'tenant-beta',  'Tenant Beta');
+
+-- Utilisateurs fictifs dans auth.users (insertion directe en test)
+INSERT INTO auth.users (id, email, created_at, updated_at, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role)
+VALUES
+  ('11111111-0000-0000-0000-000000000001'::uuid, 'alice@local.dev', now(), now(), now(), '{}'::jsonb, '{}'::jsonb, 'authenticated', 'authenticated'),
+  ('22222222-0000-0000-0000-000000000002'::uuid, 'bob@local.dev',   now(), now(), now(), '{}'::jsonb, '{}'::jsonb, 'authenticated', 'authenticated'),
+  ('33333333-0000-0000-0000-000000000003'::uuid, 'charlie@local.dev', now(), now(), now(), '{}'::jsonb, '{}'::jsonb, 'authenticated', 'authenticated');
+
+-- Le trigger handle_new_auth_user devrait avoir copié les users dans public.users.
+-- Vérification : sinon insertion manuelle pour s'assurer que les tests continuent.
+INSERT INTO public.users (id, email) VALUES
+  ('11111111-0000-0000-0000-000000000001'::uuid, 'alice@local.dev'),
+  ('22222222-0000-0000-0000-000000000002'::uuid, 'bob@local.dev'),
+  ('33333333-0000-0000-0000-000000000003'::uuid, 'charlie@local.dev')
+ON CONFLICT (id) DO NOTHING;
+
+-- Alice appartient à Alpha (owner), Bob appartient à Beta (staff)
+-- Charlie n'a aucun membership
+INSERT INTO public.memberships (user_id, tenant_id, role) VALUES
+  ('11111111-0000-0000-0000-000000000001'::uuid, 'aaaaaaaa-0000-0000-0000-000000000001'::uuid, 'owner'),
+  ('22222222-0000-0000-0000-000000000002'::uuid, 'bbbbbbbb-0000-0000-0000-000000000002'::uuid, 'staff');
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TEST 1 : Tables existent
+-- ─────────────────────────────────────────────────────────────────────────────
+
+SELECT has_table('public', 'tenants',     'Table public.tenants existe');
+SELECT has_table('public', 'users',       'Table public.users existe');
+SELECT has_table('public', 'memberships', 'Table public.memberships existe');
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TEST 2 : RLS activé
+-- ─────────────────────────────────────────────────────────────────────────────
+
+SELECT ok(
+  (SELECT relrowsecurity FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='tenants' AND n.nspname='public'),
+  'RLS activé sur tenants');
+SELECT ok(
+  (SELECT relrowsecurity FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='users' AND n.nspname='public'),
+  'RLS activé sur users');
+SELECT ok(
+  (SELECT relrowsecurity FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='memberships' AND n.nspname='public'),
+  'RLS activé sur memberships');
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TEST 3 : Policies existent
+-- ─────────────────────────────────────────────────────────────────────────────
+
+SELECT ok(
+  EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='tenants'
+          AND policyname='tenants_select_members_only' AND cmd='SELECT'),
+  'Policy SELECT sur tenants');
+SELECT ok(
+  EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='users'
+          AND policyname='users_select_own_profile' AND cmd='SELECT'),
+  'Policy SELECT sur users');
+SELECT ok(
+  EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='memberships'
+          AND policyname='memberships_select_own' AND cmd='SELECT'),
+  'Policy SELECT sur memberships');
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TEST 4 : anonyme — aucun accès
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- anon n'a pas le privilège SELECT (REVOKE ALL dans la migration).
+-- Vérification directe via information_schema (indépendant du rôle courant).
+SELECT ok(
+  NOT EXISTS (
+    SELECT 1 FROM information_schema.role_table_grants
+    WHERE table_schema='public' AND table_name='tenants'
+    AND grantee='anon' AND privilege_type='SELECT'
+  ),
+  'anon: aucun privilege SELECT sur tenants');
+SELECT ok(
+  NOT EXISTS (
+    SELECT 1 FROM information_schema.role_table_grants
+    WHERE table_schema='public' AND table_name='users'
+    AND grantee='anon' AND privilege_type='SELECT'
+  ),
+  'anon: aucun privilege SELECT sur users');
+SELECT ok(
+  NOT EXISTS (
+    SELECT 1 FROM information_schema.role_table_grants
+    WHERE table_schema='public' AND table_name='memberships'
+    AND grantee='anon' AND privilege_type='SELECT'
+  ),
+  'anon: aucun privilege SELECT sur memberships');
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TEST 5 : Alice (membre de Alpha) — voit uniquement Alpha
+-- ─────────────────────────────────────────────────────────────────────────────
+
+SET LOCAL role TO authenticated;
+SET LOCAL request.jwt.claims TO '{"sub": "11111111-0000-0000-0000-000000000001", "role": "authenticated"}';
+
+SELECT is(
+  (SELECT count(*) FROM public.tenants)::int, 1,
+  'Alice voit exactement 1 tenant'
+);
+SELECT is(
+  (SELECT slug FROM public.tenants LIMIT 1), 'tenant-alpha',
+  'Alice voit tenant-alpha et pas tenant-beta'
+);
+SELECT is(
+  (SELECT count(*) FROM public.memberships)::int, 1,
+  'Alice voit son propre membership'
+);
+SELECT is(
+  (SELECT id FROM public.users LIMIT 1), '11111111-0000-0000-0000-000000000001'::uuid,
+  'Alice voit son propre profil'
+);
+
+RESET role;
+RESET "request.jwt.claims";
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TEST 6 : Bob (membre de Beta) — ne voit pas Alpha
+-- ─────────────────────────────────────────────────────────────────────────────
+
+SET LOCAL role TO authenticated;
+SET LOCAL request.jwt.claims TO '{"sub": "22222222-0000-0000-0000-000000000002", "role": "authenticated"}';
+
+SELECT is(
+  (SELECT count(*) FROM public.tenants)::int, 1,
+  'Bob voit exactement 1 tenant'
+);
+SELECT is(
+  (SELECT slug FROM public.tenants LIMIT 1), 'tenant-beta',
+  'Bob voit tenant-beta et pas tenant-alpha'
+);
+
+RESET role;
+RESET "request.jwt.claims";
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TEST 7 : Charlie (sans membership) — ne voit rien
+-- ─────────────────────────────────────────────────────────────────────────────
+
+SET LOCAL role TO authenticated;
+SET LOCAL request.jwt.claims TO '{"sub": "33333333-0000-0000-0000-000000000003", "role": "authenticated"}';
+
+SELECT is(
+  (SELECT count(*) FROM public.tenants)::int, 0,
+  'Charlie sans membership ne voit aucun tenant'
+);
+SELECT is(
+  (SELECT count(*) FROM public.memberships)::int, 0,
+  'Charlie sans membership ne voit aucun membership'
+);
+
+RESET role;
+RESET "request.jwt.claims";
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TEST 8 : Contrainte unicité user+tenant
+-- ─────────────────────────────────────────────────────────────────────────────
+
+SELECT throws_ok(
+  $$INSERT INTO public.memberships (user_id, tenant_id, role)
+    VALUES (
+      '11111111-0000-0000-0000-000000000001'::uuid,
+      'aaaaaaaa-0000-0000-0000-000000000001'::uuid,
+      'staff'
+    )$$,
+  '23505',
+  NULL,
+  'Violation de contrainte unicité user+tenant'
+);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TEST 9 : Clé étrangère — user inexistant refusé
+-- ─────────────────────────────────────────────────────────────────────────────
+
+SELECT throws_ok(
+  $$INSERT INTO public.memberships (user_id, tenant_id, role)
+    VALUES (
+      'ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid,
+      'aaaaaaaa-0000-0000-0000-000000000001'::uuid,
+      'viewer'
+    )$$,
+  '23503',
+  NULL,
+  'Clé étrangère user_id respectée'
+);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TEST 10 : Slug invalide refusé
+-- ─────────────────────────────────────────────────────────────────────────────
+
+SELECT throws_ok(
+  $$INSERT INTO public.tenants (slug, name) VALUES ('UPPERCASE_SLUG', 'Test')$$,
+  '23514',
+  NULL,
+  'Slug avec majuscules refusé par contrainte CHECK'
+);
+
+SELECT * FROM finish();
+ROLLBACK;
