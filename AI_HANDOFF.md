@@ -165,3 +165,70 @@ pnpm install && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:co
 # Optionnel — pgTAP si Docker disponible :
 # supabase start && supabase test db
 ```
+
+---
+
+## Mise à jour F1 — Corrections pgTAP et CI finale
+
+### Commits correctifs pgTAP
+
+| SHA       | Message                                                                                   |
+| --------- | ----------------------------------------------------------------------------------------- |
+| `f04e9f0` | fix(f1): pgTAP tests — compatible avec pg_prove:3.36                                      |
+| `c3a28b2` | fix(f1): pgTAP — remplace has_row_security par pg_class.relrowsecurity                    |
+| `6fc5ed8` | fix(f1): pgTAP anon — remplace SET LOCAL role TO anon par vérification information_schema |
+
+### Problèmes pgTAP résolus
+
+1. `has_row_security(schema, table, desc)` → absent de pg_prove:3.36 — remplacé par `ok(pg_class.relrowsecurity, desc)`
+2. `has_row_security(schema, table)` → aussi absent — remplacé par requête directe sur `pg_class JOIN pg_namespace`
+3. `policy_cmd_is(...)` → absent — remplacé par `ok(EXISTS(SELECT 1 FROM pg_policies WHERE ...))`
+4. `SET LOCAL role TO anon` avec REVOKE ALL → `permission denied` au lieu de `0 lignes` — remplacé par vérification `information_schema.role_table_grants`
+5. `plan(24)` → 23 tests réels — corrigé à `plan(23)`
+
+### SHA final
+
+`6fc5ed80c1de86477fe6a0aad296019663f62f0b`
+
+### CI GitHub Actions — Run #8 (final)
+
+| Job                             | Statut     | Durée  |
+| ------------------------------- | ---------- | ------ |
+| Lint · Typecheck · Test · Build | ✅ SUCCESS | 36s    |
+| Supabase local DB tests (RLS)   | ✅ SUCCESS | 2m 48s |
+| Secret scan                     | ✅ SUCCESS | 8s     |
+
+- Vitest : 8 fichiers / 58 tests passent
+- pgTAP RLS : 23/23 tests passent
+- Types TypeScript générés et comparés (step `Generate TypeScript types`)
+- DB advisors exécutés (step `Check DB advisors`)
+- Scan secrets : aucune fuite détectée
+
+### Validation locale finale
+
+| Vérification                     | Résultat                                      |
+| -------------------------------- | --------------------------------------------- |
+| `pnpm install --frozen-lockfile` | ✅ PASS                                       |
+| `pnpm format:check`              | ✅ PASS                                       |
+| `pnpm lint`                      | ✅ PASS (0 warnings)                          |
+| `pnpm typecheck`                 | ✅ PASS (0 errors)                            |
+| `pnpm test`                      | ✅ PASS 58/58                                 |
+| `pnpm test:coverage`             | ✅ PASS 90.9% stmts / 100% branches / 80% fns |
+| `pnpm build`                     | ✅ PASS                                       |
+| `pnpm audit`                     | ✅ PASS (0 vulnérabilités)                    |
+| `git diff --check`               | ✅ PASS                                       |
+
+### Commande de démarrage Codex (revue finale)
+
+```bash
+git fetch origin claude/f1-identity-tenant-auth
+git checkout claude/f1-identity-tenant-auth
+# SHA attendu : 6fc5ed80c1de86477fe6a0aad296019663f62f0b
+pnpm install --frozen-lockfile
+pnpm format:check && pnpm lint && pnpm typecheck
+pnpm test && pnpm test:coverage
+APP_ENV=production NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=test pnpm build
+pnpm audit
+# Supabase local (si Docker disponible) :
+# supabase start && supabase db reset && supabase test db && supabase db advisors && supabase stop
+```
