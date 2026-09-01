@@ -50,9 +50,15 @@ SELECT has_table('public', 'memberships', 'Table public.memberships existe');
 -- TEST 2 : RLS activé
 -- ─────────────────────────────────────────────────────────────────────────────
 
-SELECT ok(has_row_security('public', 'tenants'),     'RLS activé sur tenants');
-SELECT ok(has_row_security('public', 'users'),       'RLS activé sur users');
-SELECT ok(has_row_security('public', 'memberships'), 'RLS activé sur memberships');
+SELECT ok(
+  (SELECT relrowsecurity FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='tenants' AND n.nspname='public'),
+  'RLS activé sur tenants');
+SELECT ok(
+  (SELECT relrowsecurity FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='users' AND n.nspname='public'),
+  'RLS activé sur users');
+SELECT ok(
+  (SELECT relrowsecurity FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='memberships' AND n.nspname='public'),
+  'RLS activé sur memberships');
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- TEST 3 : Policies existent
