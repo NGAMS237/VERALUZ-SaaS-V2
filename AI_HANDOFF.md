@@ -242,11 +242,10 @@ pnpm audit
 - **Projet** : VERALUZ SaaS V2
 - **Lot** : CORE-1 — inventaire chambres & paramètres opérationnels
 - **Branche** : `claude/core-1-rooms-categories-settings`
-- **Stacked sur** : F1 SHA `68e57317f0247d09f9b320b4d809e23986f047d2` (non mergé)
-- **HEAD CORE-1** : `883b7e6`
+- **Stacked sur** : F1 mergé dans main — SHA merge `8a02cfa0edabeab4174ef8b52ed4476c591b5c9a`
+- **HEAD CORE-1** : _mis à jour après commit correctif R1 — voir SHA ci-dessous_
 - **Agent** : Claude (Sonnet 4.6)
-- **Date** : 2026-09-01
-- **STACKED_ON_UNMERGED_F1** : OUI
+- **Date** : 2026-09-01 / correctifs R1 : 2026-09-02
 
 ## Périmètre livré
 
@@ -254,14 +253,14 @@ pnpm audit
 
 | Table                         | Points clés                                                                                                                                                                                     |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `room_categories`             | UNIQUE (tenant_id, code), CHECK occupancy coherence (max_occupancy ≥ base_occupancy, max_adults ≤ max_occupancy)                                                                                |
-| `rooms`                       | ENUM `room_operational_status` (active/inactive/out_of_service), CHECK cross-tenant FK via sous-requête                                                                                         |
+| `room_categories`             | UNIQUE (tenant_id, code), UNIQUE (tenant_id, id) [requis pour FK composite], CHECK occupancy coherence (max_occupancy ≥ base_occupancy, max_adults ≤ max_occupancy)                             |
+| `rooms`                       | ENUM `room_operational_status` (active/inactive/out_of_service), FK composite (tenant_id, room_category_id) → room_categories(tenant_id, id) pour cohérence cross-tenant au niveau DB           |
 | `tenant_operational_settings` | PK = tenant_id (1 ligne par tenant), check_out_time DEFAULT '12:00'                                                                                                                             |
 | RLS                           | ENABLE FORCE sur les 3 tables ; SELECT pour membres authentifiés ; INSERT/UPDATE pour owner/admin avec WITH CHECK tenant_id immuable ; REVOKE ALL → GRANT SELECT,INSERT,UPDATE TO authenticated |
 
 ### pgTAP (`supabase/tests/02_rls_room_inventory.test.sql`)
 
-- **40 assertions** : existence tables, RLS activé, FK, indexes, contraintes UNIQUE, rejet cross-tenant, CHECK occupancy, anon refusé, DELETE refusé, unicité settings
+- **44 assertions** : existence tables, RLS activé, FK composite, indexes, contraintes UNIQUE, rejet cross-tenant (FK 23503), CHECK occupancy, anon refusé, DELETE refusé, unicité settings, 4 tests comportementaux RLS réels (SET LOCAL role)
 
 ### TypeScript domain layer
 
@@ -306,16 +305,19 @@ pnpm audit
 ## Décisions techniques notables
 
 1. **`new URL(req.url).searchParams`** — utilisé à la place de `req.nextUrl.searchParams` pour compatibilité avec `Request` plain dans les tests Vitest.
-2. **CHECK cross-tenant** — protection FK implémentée au niveau PostgreSQL via sous-requête dans la contrainte CHECK de `rooms`, pas seulement TypeScript.
-3. **`exactOptionalPropertyTypes`** — tous les spreads conditionnels utilisent `...(x !== undefined ? { field: x } : {})`.
-4. **`server.ts` exclu de la couverture** — adaptateur cookie Supabase non testable en unité.
-5. **`STACKED_ON_UNMERGED_F1`** — aucun merge, aucun rebase, aucun push force.
+2. **FK composite cross-tenant** — `FOREIGN KEY (tenant_id, room_category_id) REFERENCES room_categories(tenant_id, id)` garantit qu'une chambre ne peut référencer une catégorie d'un autre tenant au niveau PostgreSQL (SQLSTATE 23503). Remplace l'ancienne sous-requête CHECK (interdite en PostgreSQL).
+3. **UNIQUE(tenant_id, id) sur room_categories** — nécessaire pour que la FK composite puisse référencer (tenant_id, id) ; PostgreSQL exige une contrainte unique sur les colonnes référencées.
+4. **Triggers tenant_id immuable** — `private.prevent_tenant_id_change()` déclenché BEFORE UPDATE sur les 3 tables ; lève SQLSTATE P0001 si tenant_id est modifié.
+5. **Tests pgTAP comportementaux** — 4 assertions SET LOCAL role : alice voit Alpha, charlie voit 0 lignes, alice peut INSERT, eve (viewer) ne peut pas INSERT.
+6. **`exactOptionalPropertyTypes`** — tous les spreads conditionnels utilisent `...(x !== undefined ? { field: x } : {})`.
+7. **`server.ts` exclu de la couverture** — adaptateur cookie Supabase non testable en unité.
 
 ## Pour le prochain agent
 
-- La branche `claude/core-1-rooms-categories-settings` est prête pour revue PR.
-- Merger F1 d'abord, puis rebaser CORE-1 sur `main` après merge F1.
-- Valider les tests pgTAP avec `supabase db test` (Docker requis).
+- F1 est mergé dans main (SHA `8a02cfa0edabeab4174ef8b52ed4476c591b5c9a`).
+- La branche `claude/core-1-rooms-categories-settings` cible directement `main`.
+- PR #2 ouverte — attente CI verte sur le SHA correctif R1.
+- Valider les tests pgTAP avec `supabase start && supabase db reset && supabase test db` (Docker requis).
 - Prochains lots suggérés : CORE-2 (réservations), CORE-3 (tarifs).
 
 ## Contraintes de sécurité (inchangées, toujours actives)

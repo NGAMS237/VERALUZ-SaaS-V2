@@ -2,7 +2,6 @@
 -- Lot: CORE-1 — Chambres, Catégories et Paramètres Opérationnels
 -- Auteur: Claude (implémenteur CORE-1)
 -- Date: 2026-09-01
--- STACKED_ON_UNMERGED_F1: OUI
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 1. TYPE — statut opérationnel chambre
@@ -38,6 +37,7 @@ CREATE TABLE IF NOT EXISTS public.room_categories (
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
 
   CONSTRAINT room_categories_tenant_code_unique    UNIQUE (tenant_id, code),
+  CONSTRAINT room_categories_tenant_id_id_unique     UNIQUE (tenant_id, id),
   CONSTRAINT room_categories_code_format           CHECK (code ~ '^[A-Z0-9][A-Z0-9_-]{0,31}$'),
   CONSTRAINT room_categories_code_nonempty         CHECK (length(trim(code)) > 0),
   CONSTRAINT room_categories_name_nonempty         CHECK (length(trim(name)) > 0),
@@ -69,7 +69,7 @@ CREATE TRIGGER room_categories_set_updated_at
 CREATE TABLE IF NOT EXISTS public.rooms (
   id                  UUID                           PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id           UUID                           NOT NULL REFERENCES public.tenants (id) ON DELETE CASCADE,
-  room_category_id    UUID                           NOT NULL REFERENCES public.room_categories (id) ON DELETE RESTRICT,
+  room_category_id    UUID                           NOT NULL,
   code                TEXT                           NOT NULL,
   name                TEXT,
   floor               TEXT,
@@ -79,9 +79,11 @@ CREATE TABLE IF NOT EXISTS public.rooms (
   created_at          TIMESTAMPTZ                    NOT NULL DEFAULT now(),
   updated_at          TIMESTAMPTZ                    NOT NULL DEFAULT now(),
 
-  CONSTRAINT rooms_tenant_code_unique      UNIQUE (tenant_id, code),
-  CONSTRAINT rooms_code_format             CHECK (code ~ '^[A-Za-z0-9][A-Za-z0-9_-]{0,31}$'),
-  CONSTRAINT rooms_code_nonempty           CHECK (length(trim(code)) > 0)
+  CONSTRAINT rooms_tenant_code_unique          UNIQUE (tenant_id, code),
+  CONSTRAINT rooms_code_format                 CHECK (code ~ '^[A-Za-z0-9][A-Za-z0-9_-]{0,31}$'),
+  CONSTRAINT rooms_code_nonempty               CHECK (length(trim(code)) > 0),
+  CONSTRAINT rooms_category_same_tenant_fk     FOREIGN KEY (tenant_id, room_category_id)
+    REFERENCES public.room_categories (tenant_id, id) ON DELETE RESTRICT
 );
 
 COMMENT ON TABLE  public.rooms IS 'Chambres par tenant — CORE-1. Statuts structurels uniquement.';
@@ -275,8 +277,36 @@ CREATE POLICY "tenant_settings_update_owner_admin"
     )
   );
 
+
 -- ─────────────────────────────────────────────────────────────────────────────
--- 9. GRANTS
+-- 9. TRIGGERS — immutabilité tenant_id
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE FUNCTION private.prevent_tenant_id_change()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+  IF NEW.tenant_id IS DISTINCT FROM OLD.tenant_id THEN
+    RAISE EXCEPTION 'tenant_id is immutable and cannot be changed'
+      USING ERRCODE = 'P0001';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER room_categories_immutable_tenant_id
+  BEFORE UPDATE ON public.room_categories
+  FOR EACH ROW EXECUTE FUNCTION private.prevent_tenant_id_change();
+
+CREATE TRIGGER rooms_immutable_tenant_id
+  BEFORE UPDATE ON public.rooms
+  FOR EACH ROW EXECUTE FUNCTION private.prevent_tenant_id_change();
+
+CREATE TRIGGER tenant_settings_immutable_tenant_id
+  BEFORE UPDATE ON public.tenant_operational_settings
+  FOR EACH ROW EXECUTE FUNCTION private.prevent_tenant_id_change();
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 10. GRANTS
 -- ─────────────────────────────────────────────────────────────────────────────
 
 REVOKE ALL ON public.room_categories             FROM anon, authenticated;

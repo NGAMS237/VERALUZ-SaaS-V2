@@ -1,13 +1,12 @@
 -- Tests pgTAP — Isolation RLS CORE-1 : room_categories, rooms, tenant_operational_settings
 -- Lot CORE-1 — VERALUZ SaaS V2
--- STACKED_ON_UNMERGED_F1: OUI
 --
 -- Pré-requis : supabase db reset && supabase test db
--- Plan : 40 assertions
+-- Plan : 44 assertions
 
 BEGIN;
 
-SELECT plan(40);
+SELECT plan(44);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- FIXTURES (reprend les UUIDs du test F1 pour cohérence)
@@ -53,8 +52,8 @@ INSERT INTO public.room_categories (id, tenant_id, code, name, base_occupancy, m
 
 -- Chambres Alpha et Beta
 INSERT INTO public.rooms (id, tenant_id, room_category_id, code, name) VALUES
-  ('rr111111-0000-0000-0000-000000000001'::uuid, 'aaaaaaaa-0000-0000-0000-000000000001'::uuid, 'cc111111-0000-0000-0000-000000000001'::uuid, '101', 'Chambre 101 Alpha'),
-  ('rr222222-0000-0000-0000-000000000002'::uuid, 'bbbbbbbb-0000-0000-0000-000000000002'::uuid, 'cc222222-0000-0000-0000-000000000002'::uuid, '101', 'Chambre 101 Beta');
+  ('dd111111-0000-0000-0000-000000000001'::uuid, 'aaaaaaaa-0000-0000-0000-000000000001'::uuid, 'cc111111-0000-0000-0000-000000000001'::uuid, '101', 'Chambre 101 Alpha'),
+  ('dd222222-0000-0000-0000-000000000002'::uuid, 'bbbbbbbb-0000-0000-0000-000000000002'::uuid, 'cc222222-0000-0000-0000-000000000002'::uuid, '101', 'Chambre 101 Beta');
 
 -- Paramètres tenant Alpha
 INSERT INTO public.tenant_operational_settings (tenant_id, timezone, currency_code, locale, check_out_time)
@@ -157,7 +156,7 @@ SELECT ok(
 SELECT ok(
   EXISTS(SELECT 1 FROM public.rooms r
     JOIN public.room_categories rc ON rc.id = r.room_category_id
-    WHERE r.id = 'rr111111-0000-0000-0000-000000000001'::uuid
+    WHERE r.id = 'dd111111-0000-0000-0000-000000000001'::uuid
       AND r.tenant_id = rc.tenant_id),
   'La chambre Alpha est associee a la categorie Alpha (meme tenant)');
 
@@ -170,9 +169,9 @@ SELECT throws_ok(
     VALUES ('aaaaaaaa-0000-0000-0000-000000000001'::uuid,
             'cc222222-0000-0000-0000-000000000002'::uuid,
             'X99')$$,
-  '23514',
+  '23503',
   NULL,
-  'Chambre du tenant A avec categorie du tenant B refuse par CHECK');
+  'Chambre du tenant A avec categorie du tenant B refuse par FK composite');
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- TEST 11 : Capacités incohérentes refusées
@@ -343,7 +342,13 @@ SELECT ok(
 -- TEST 26 : supprimé — subquery dans CHECK interdit en PostgreSQL; cohérence tenant garantie par RLS
 -- ─────────────────────────────────────────────────────────────────────────────
 
-SELECT pass('rooms_category_same_tenant CHECK supprimé (subquery interdit) — cohérence tenant via RLS');
+SELECT throws_ok(
+  $$UPDATE public.rooms
+      SET room_category_id = 'cc222222-0000-0000-0000-000000000002'
+    WHERE id = 'dd111111-0000-0000-0000-000000000001'$$,
+  '23503',
+  NULL,
+  'FK composite bloque reassignation categorie inter-tenant via UPDATE (23503)');
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- TEST 27 : Enum room_operational_status existe
@@ -360,7 +365,7 @@ SELECT ok(
 SELECT ok(
   (SELECT operational_status::text = 'active'
    FROM public.rooms
-   WHERE id = 'rr111111-0000-0000-0000-000000000001'::uuid),
+   WHERE id = 'dd111111-0000-0000-0000-000000000001'::uuid),
   'rooms: operational_status par defaut = active');
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -382,6 +387,52 @@ SELECT ok(
     WHERE table_schema='public' AND table_name='tenant_operational_settings'
       AND grantee='anon' AND privilege_type='SELECT'),
   'anon na pas SELECT sur tenant_operational_settings');
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TESTS 31-34 : Comportements RLS réels (SET LOCAL role)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- TEST 31 : alice (owner Alpha) voit les room_categories de son tenant
+SAVEPOINT rls_test_31;
+SET LOCAL role TO authenticated;
+SET LOCAL "request.jwt.claims" TO '{"sub":"11111111-0000-0000-0000-000000000001","role":"authenticated"}';
+SELECT ok(
+  (SELECT count(*)::int > 0 FROM public.room_categories
+   WHERE tenant_id = 'aaaaaaaa-0000-0000-0000-000000000001'::uuid),
+  'RLS: alice (owner Alpha) voit room_categories de son tenant');
+ROLLBACK TO SAVEPOINT rls_test_31;
+
+-- TEST 32 : charlie (aucun membership) voit 0 lignes
+SAVEPOINT rls_test_32;
+SET LOCAL role TO authenticated;
+SET LOCAL "request.jwt.claims" TO '{"sub":"33333333-0000-0000-0000-000000000003","role":"authenticated"}';
+SELECT ok(
+  (SELECT count(*)::int = 0 FROM public.room_categories),
+  'RLS: charlie (sans membership) ne voit aucune room_category');
+ROLLBACK TO SAVEPOINT rls_test_32;
+
+-- TEST 33 : alice (owner) peut INSERT dans room_categories
+SAVEPOINT rls_test_33;
+SET LOCAL role TO authenticated;
+SET LOCAL "request.jwt.claims" TO '{"sub":"11111111-0000-0000-0000-000000000001","role":"authenticated"}';
+SELECT lives_ok(
+  $$INSERT INTO public.room_categories (tenant_id, code, name, base_occupancy, max_adults, max_children, max_occupancy)
+    VALUES ('aaaaaaaa-0000-0000-0000-000000000001', 'DLX', 'Deluxe Alpha', 1, 2, 1, 3)$$,
+  'RLS: alice (owner) peut INSERT dans room_categories');
+ROLLBACK TO SAVEPOINT rls_test_33;
+
+-- TEST 34 : eve (viewer) ne peut pas INSERT dans room_categories
+SAVEPOINT rls_test_34;
+SET LOCAL role TO authenticated;
+SET LOCAL "request.jwt.claims" TO '{"sub":"55555555-0000-0000-0000-000000000005","role":"authenticated"}';
+SELECT throws_ok(
+  $$INSERT INTO public.room_categories (tenant_id, code, name, base_occupancy, max_adults, max_children, max_occupancy)
+    VALUES ('aaaaaaaa-0000-0000-0000-000000000001', 'VIP', 'VIP Alpha', 1, 2, 1, 3)$$,
+  NULL,
+  NULL,
+  'RLS: eve (viewer) ne peut pas INSERT dans room_categories');
+ROLLBACK TO SAVEPOINT rls_test_34;
 
 SELECT * FROM finish();
 ROLLBACK;
