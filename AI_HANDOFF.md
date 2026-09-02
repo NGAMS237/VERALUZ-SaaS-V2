@@ -232,3 +232,99 @@ pnpm audit
 # Supabase local (si Docker disponible) :
 # supabase start && supabase db reset && supabase test db && supabase db advisors && supabase stop
 ```
+
+---
+
+# AI_HANDOFF — CORE-1 : room_categories, rooms, tenant_operational_settings
+
+## Statut
+
+- **Projet** : VERALUZ SaaS V2
+- **Lot** : CORE-1 — inventaire chambres & paramètres opérationnels
+- **Branche** : `claude/core-1-rooms-categories-settings`
+- **Stacked sur** : F1 mergé dans main — SHA merge `8a02cfa0edabeab4174ef8b52ed4476c591b5c9a`
+- **HEAD CORE-1** : `7ce1d49`
+- **Agent** : Claude (Sonnet 4.6)
+- **Date** : 2026-09-01 / correctifs R1 : 2026-09-02
+
+## Périmètre livré
+
+### Base de données (migration `20260901100000_create_room_inventory_schema.sql`)
+
+| Table                         | Points clés                                                                                                                                                                                     |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `room_categories`             | UNIQUE (tenant_id, code), UNIQUE (tenant_id, id) [requis pour FK composite], CHECK occupancy coherence (max_occupancy ≥ base_occupancy, max_adults ≤ max_occupancy)                             |
+| `rooms`                       | ENUM `room_operational_status` (active/inactive/out_of_service), FK composite (tenant_id, room_category_id) → room_categories(tenant_id, id) pour cohérence cross-tenant au niveau DB           |
+| `tenant_operational_settings` | PK = tenant_id (1 ligne par tenant), check_out_time DEFAULT '12:00'                                                                                                                             |
+| RLS                           | ENABLE FORCE sur les 3 tables ; SELECT pour membres authentifiés ; INSERT/UPDATE pour owner/admin avec WITH CHECK tenant_id immuable ; REVOKE ALL → GRANT SELECT,INSERT,UPDATE TO authenticated |
+
+### pgTAP (`supabase/tests/02_rls_room_inventory.test.sql`)
+
+- **44 assertions** : existence tables, RLS activé, FK composite, indexes, contraintes UNIQUE, rejet cross-tenant (FK 23503), CHECK occupancy, anon refusé, DELETE refusé, unicité settings, 4 tests comportementaux RLS réels (SET LOCAL role)
+
+### TypeScript domain layer
+
+- `src/modules/rooms/domain/types.ts` — interfaces + 7 classes d'erreur
+- `src/modules/rooms/domain/validators.ts` — Zod avec `exactOptionalPropertyTypes`
+- `src/modules/rooms/services/room-category.service.ts` — CRUD + cohérence occupancy
+- `src/modules/rooms/services/room.service.ts` — CRUD + gestion statut
+- `src/modules/settings/domain/types.ts` + `validators.ts`
+- `src/modules/settings/services/tenant-settings.service.ts`
+- Persistence Supabase typée (pas de `Record<string,unknown>`)
+
+### Route Handlers (7 routes sous `/api/kjemo/v1/t/[tenantSlug]/`)
+
+- `GET/POST /room-categories`
+- `GET/PATCH /room-categories/[categoryId]`
+- `PATCH /room-categories/[categoryId]/active`
+- `GET/POST /rooms`
+- `GET/PATCH /rooms/[roomId]`
+- `PATCH /rooms/[roomId]/status`
+- `GET/PUT /settings`
+- `src/lib/api/response.ts` — `ok()`, `created()`, `handleError()` avec mapping complet
+
+### Tests TypeScript — 148 tests, 0 échec
+
+- Couverture : **94.66% stmts / 90% branches / 100% funcs / 96.23% lines** (seuil 80%)
+- `tests/api/core1/` — 6 fichiers route handlers
+- `tests/lib/response.test.ts` — 13 tests handleError
+- `tests/modules/rooms/` — validators (29) + domain (9)
+- `tests/modules/settings/` — validators (11)
+
+## Résultats de validation
+
+| Étape                   | Résultat                                                |
+| ----------------------- | ------------------------------------------------------- |
+| `tsc --noEmit`          | ✅ 0 erreur                                             |
+| `eslint src`            | ✅ 0 avertissement                                      |
+| `next build`            | ✅ succès                                               |
+| `vitest run`            | ✅ 148/148                                              |
+| `vitest run --coverage` | ✅ ≥ 80% toutes métriques                               |
+| pgTAP (Docker requis)   | ⏳ non exécuté localement (Docker absent en CI sandbox) |
+
+## Décisions techniques notables
+
+1. **`new URL(req.url).searchParams`** — utilisé à la place de `req.nextUrl.searchParams` pour compatibilité avec `Request` plain dans les tests Vitest.
+2. **FK composite cross-tenant** — `FOREIGN KEY (tenant_id, room_category_id) REFERENCES room_categories(tenant_id, id)` garantit qu'une chambre ne peut référencer une catégorie d'un autre tenant au niveau PostgreSQL (SQLSTATE 23503). Remplace l'ancienne sous-requête CHECK (interdite en PostgreSQL).
+3. **UNIQUE(tenant_id, id) sur room_categories** — nécessaire pour que la FK composite puisse référencer (tenant_id, id) ; PostgreSQL exige une contrainte unique sur les colonnes référencées.
+4. **Triggers tenant_id immuable** — `private.prevent_tenant_id_change()` déclenché BEFORE UPDATE sur les 3 tables ; lève SQLSTATE P0001 si tenant_id est modifié.
+5. **Tests pgTAP comportementaux** — 4 assertions SET LOCAL role : alice voit Alpha, charlie voit 0 lignes, alice peut INSERT, eve (viewer) ne peut pas INSERT.
+6. **`exactOptionalPropertyTypes`** — tous les spreads conditionnels utilisent `...(x !== undefined ? { field: x } : {})`.
+7. **`server.ts` exclu de la couverture** — adaptateur cookie Supabase non testable en unité.
+
+## Pour le prochain agent
+
+- F1 est mergé dans main (SHA `8a02cfa0edabeab4174ef8b52ed4476c591b5c9a`).
+- La branche `claude/core-1-rooms-categories-settings` cible directement `main`.
+- PR #2 ouverte — attente CI verte sur le SHA correctif R1.
+- Valider les tests pgTAP avec `supabase start && supabase db reset && supabase test db` (Docker requis).
+- Prochains lots suggérés : CORE-2 (réservations), CORE-3 (tarifs).
+
+## Contraintes de sécurité (inchangées, toujours actives)
+
+- Aucun PAT demandé, affiché ou utilisé
+- Aucun token dans une commande, URL, log, commit ou rapport
+- Aucun push force / Aucun push vers `main` / Aucun merge
+- Aucun déploiement / Aucun Supabase distant / Aucun Resend
+- Ne lance pas Codex
+- Aucun import depuis `NGAMS237/veraluz-os`

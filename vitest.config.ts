@@ -21,6 +21,8 @@ export default defineConfig({
         "**/*.d.ts",
         // database.types.ts is a pure type file — no executable runtime code
         "src/lib/database.types.ts",
+        // server.ts is a Supabase cookie-bridge adapter — not unit-testable
+        "src/lib/supabase/server.ts",
       ],
       thresholds: {
         lines: 80,
