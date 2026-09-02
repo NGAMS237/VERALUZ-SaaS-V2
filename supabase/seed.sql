@@ -52,7 +52,12 @@ VALUES
 ON CONFLICT (tenant_id, code) DO NOTHING;
 
 INSERT INTO public.rooms (tenant_id, room_category_id, code, floor, operational_status)
-SELECT '00000000-0000-0000-0000-000000000001'::uuid, rc.id, room.code, room.floor, room.status
+SELECT
+  '00000000-0000-0000-0000-000000000001'::uuid,
+  rc.id,
+  room.code,
+  room.floor,
+  room.status::public.room_operational_status
 FROM (
   VALUES
     ('101', '1', 'STD', 'active'),
