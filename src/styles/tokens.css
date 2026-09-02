@@ -106,4 +106,73 @@
 
   /* ── Icon sizes ── */
   --vlz-icon-size-wordmark: 3rem; /* 48px — wordmark SVG rendered size */
+
+  /* ── Couleurs — Rôles de surface (clair) ──
+     Mapping Horizon Signature UI System : canvas/surface/raised/soft. */
+  --vlz-color-surface-canvas: var(--vlz-color-brand-surface); /* fond de page */
+  --vlz-color-surface-base: #fffdf9; /* carte standard */
+  --vlz-color-surface-raised: #ffffff; /* carte élevée / popover */
+  --vlz-color-surface-soft: #eef1f6; /* panneau discret, en-tête de table, item actif */
+  --vlz-color-surface-inverse: var(--vlz-color-brand-primary); /* sidebar Ink/Navy */
+  --vlz-color-surface-inverse-strong: #0e2c48; /* survol/actif sur surface inverse */
+
+  /* ── Couleurs — Rôles de texte (clair) ── */
+  --vlz-color-text-primary: var(--vlz-color-neutral-900);
+  --vlz-color-text-secondary: #5a6472;
+  --vlz-color-text-muted: #8792a1;
+  --vlz-color-text-inverse: #f4f7fb; /* texte sur surface inverse (sidebar) */
+  --vlz-color-text-inverse-muted: #b7c3d4;
+  --vlz-color-text-link: var(--vlz-color-status-info);
+
+  /* ── Couleurs — Bordures (clair) ── */
+  --vlz-color-border-default: rgba(20, 43, 72, 0.12);
+  --vlz-color-border-strong: rgba(20, 43, 72, 0.22);
+  --vlz-color-border-inverse: rgba(244, 247, 251, 0.14);
+
+  /* ── Couleurs — Focus ── */
+  --vlz-color-focus-ring: var(--vlz-color-status-info);
+
+  /* ── Rayons — Géométrie signature (Horizon) ── */
+  --vlz-radius-organic: 3rem; /* 48px */
+  --vlz-radius-signature: 4rem; /* 64px */
+
+  /* ── Ombres additionnelles ── */
+  --vlz-shadow-soft: 0 0.75rem 2.1875rem rgba(24, 43, 70, 0.08);
+
+  /* ── Transitions additionnelles ── */
+  --vlz-motion-fast: 140ms ease;
+  --vlz-motion-normal: 220ms ease;
+
+  /* ── Layout additionnel ── */
+  --vlz-header-height: 4rem; /* 64px */
+  --vlz-sidebar-width-collapsed: 4.5rem; /* 72px */
+}
+
+/*
+ * Thème sombre — appliqué via [data-theme="dark"] sur <html>.
+ * Seuls les tokens de rôle (surface/texte/bordure) changent de valeur ;
+ * la palette --vlz-color-neutral-* et --vlz-color-brand-* restent fixes.
+ */
+[data-theme="dark"] {
+  --vlz-color-surface-canvas: #0b1626;
+  --vlz-color-surface-base: #101d30;
+  --vlz-color-surface-raised: #14233a;
+  --vlz-color-surface-soft: #1a2c45;
+  --vlz-color-surface-inverse: #081524;
+  --vlz-color-surface-inverse-strong: #0f2038;
+
+  --vlz-color-text-primary: #f2f5f9;
+  --vlz-color-text-secondary: #b7c1cf;
+  --vlz-color-text-muted: #8592a3;
+  --vlz-color-text-inverse: #f2f5f9;
+  --vlz-color-text-inverse-muted: #93a1b3;
+
+  --vlz-color-border-default: rgba(216, 229, 244, 0.12);
+  --vlz-color-border-strong: rgba(216, 229, 244, 0.22);
+  --vlz-color-border-inverse: rgba(216, 229, 244, 0.1);
+
+  --vlz-shadow-soft: 0 0.75rem 2.1875rem rgba(0, 0, 0, 0.28);
+  --vlz-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --vlz-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.35);
+  --vlz-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
 }

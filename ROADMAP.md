@@ -120,7 +120,7 @@ Audit
 
 ### F0-R1 — Corrections post-revue Codex
 
-**Statut : EN COURS**
+**Statut : LIVRÉ**
 **Branche** : `claude/f0-review-fixes`
 **Assigné à** : Claude (corrections) → Codex (seconde revue)
 
@@ -130,8 +130,9 @@ Corrections R1-01 à R1-16 sur le socle F0.
 
 ### F1 — Identité, tenant et sécurité
 
-**Statut : PLANIFIÉ**
-**Assigné à** : Codex (implémentation) → Claude (revue)
+**Statut : LIVRÉ — mergé dans `main`**
+**Assigné à** : Claude (implémentation, gouvernance révisée par Blaise)
+**SHA merge** : `8a02cfa0edabeab4174ef8b52ed4476c591b5c9a`
 
 - Supabase local : initialisation du projet, migrations initiales
 - Schéma multi-tenant : `tenants`, `users`, `memberships`
@@ -144,24 +145,35 @@ Corrections R1-01 à R1-16 sur le socle F0.
 
 ### CORE-1 — Établissements, chambres, catégories et paramètres
 
-**Statut : PLANIFIÉ**
+**Statut : LIVRÉ — mergé dans `main`**
+**PR** : #2 · **SHA merge** : `677cef4f3bb157ad519bbe95bffaa6141ed216cc`
 
-- CRUD établissements et propriétés par tenant
-- CRUD chambres et unités
-- CRUD catégories de chambres
-- Paramètres opérationnels (heure de départ, politiques, etc.)
-- Tarifs de base et disponibilités
+- CRUD catégories de chambres (`room_categories`)
+- CRUD chambres (`rooms`) avec statut opérationnel (active/inactive/out_of_service)
+- Paramètres opérationnels tenant (`tenant_operational_settings`) : fuseau horaire,
+  devise, locale, heures de check-in/check-out
+- RLS complète avec FK composite cross-tenant, triggers `tenant_id` immuable
+- Périmètre non couvert (intentionnel) : tarifs et disponibilités → lot dédié futur
 
 ---
 
-### UI-1 — Design System et shell applicatif
+### UI-1 — Horizon App Shell et interface fonctionnelle
 
-**Statut : PLANIFIÉ**
+**Statut : LIVRÉ**
 
-- Composants React fondamentaux consommant les tokens `--vlz-*`
-- Layout applicatif (sidebar, header, contenu)
-- Page de login et dashboard vide
-- Shell responsive pour les modules métier à venir
+- Shell applicatif responsive : sidebar Ink/Navy, header, sélecteur tenant, menu
+  utilisateur, menu mobile, bascule clair/sombre, navigation clavier
+- Mapping du design Horizon Signature UI System dans les tokens `--vlz-*` existants
+  (aucun système `--hz-*` parallèle) — voir `docs/DESIGN_SYSTEM.md`
+- Routes : `/login` (restylé), `/t/[tenantSlug]/dashboard`, `/rooms`,
+  `/room-categories`, `/settings`
+- CRUD complet chambres et catégories, activation/désactivation, filtres,
+  paramètres opérationnels — permissions owner/admin (écriture) vs staff/viewer
+  (lecture seule)
+- Placeholders honnêtes « À venir » pour les 16 domaines futurs de la roadmap
+  (`/t/[tenantSlug]/modules/[moduleSlug]`)
+- États gérés sur chaque écran : loading, empty, succès, validation, 401/403/404/409,
+  erreur serveur/réseau, double soumission, rafraîchissement après mutation
 
 ---
 
@@ -368,28 +380,28 @@ Même périmètre d'audit que MIG-R1, appliqué au Guest Portal V1.
 
 ## Tableau de bord des lots
 
-| Lot      | Contenu                               | Statut      | Assignation            |
-| -------- | ------------------------------------- | ----------- | ---------------------- |
-| F0       | Socle technique                       | ✅ LIVRÉ    | Claude → Codex (revue) |
-| F0-R1    | Corrections socle                     | 🔄 EN COURS | Claude → Codex (revue) |
-| F1       | Identité, tenant et sécurité          | PLANIFIÉ    | Codex → Claude (revue) |
-| CORE-1   | Établissements, chambres, paramètres  | PLANIFIÉ    | TBD                    |
-| UI-1     | Design System et shell applicatif     | PLANIFIÉ    | TBD                    |
-| MIG-R1   | Audit fonctionnel Réservations V1     | PLANIFIÉ    | TBD                    |
-| RES-1    | Réservations V2                       | PLANIFIÉ    | TBD                    |
-| STAY-1   | Arrivée, check-in et séjour           | PLANIFIÉ    | TBD                    |
-| STAY-2   | Folio, charges et check-out           | PLANIFIÉ    | TBD                    |
-| MIG-G1   | Audit fonctionnel Guest Portal V1     | PLANIFIÉ    | TBD                    |
-| GUEST-1  | Guest Portal V2                       | PLANIFIÉ    | TBD                    |
-| OPS-1    | Housekeeping                          | PLANIFIÉ    | TBD                    |
-| OPS-2    | Maintenance                           | PLANIFIÉ    | TBD                    |
-| FNB-1    | Restaurant, room service et livraison | PLANIFIÉ    | TBD                    |
-| PAY-1    | Paiements clients                     | PLANIFIÉ    | TBD                    |
-| FIN-1    | Comptabilité et rapports financiers   | PLANIFIÉ    | TBD                    |
-| HR-1     | RH et paie                            | PLANIFIÉ    | TBD                    |
-| DOC-1    | Documents                             | PLANIFIÉ    | TBD                    |
-| CRM-1    | CRM, communications et notifications  | PLANIFIÉ    | TBD                    |
-| REPORT-1 | Rapports et tableaux de bord          | PLANIFIÉ    | TBD                    |
-| AI-1     | Centre IA et agents                   | PLANIFIÉ    | TBD                    |
-| MOB-1    | PWA et applications mobiles           | PLANIFIÉ    | TBD                    |
-| GA       | Préparation production et pilote      | PLANIFIÉ    | À décider avec Blaise  |
+| Lot      | Contenu                               | Statut   | Assignation            |
+| -------- | ------------------------------------- | -------- | ---------------------- |
+| F0       | Socle technique                       | ✅ LIVRÉ | Claude → Codex (revue) |
+| F0-R1    | Corrections socle                     | ✅ LIVRÉ | Claude → Codex (revue) |
+| F1       | Identité, tenant et sécurité          | ✅ LIVRÉ | Claude                 |
+| CORE-1   | Établissements, chambres, paramètres  | ✅ LIVRÉ | Claude                 |
+| UI-1     | Horizon App Shell et interface        | ✅ LIVRÉ | Claude                 |
+| MIG-R1   | Audit fonctionnel Réservations V1     | PLANIFIÉ | TBD                    |
+| RES-1    | Réservations V2                       | PLANIFIÉ | TBD                    |
+| STAY-1   | Arrivée, check-in et séjour           | PLANIFIÉ | TBD                    |
+| STAY-2   | Folio, charges et check-out           | PLANIFIÉ | TBD                    |
+| MIG-G1   | Audit fonctionnel Guest Portal V1     | PLANIFIÉ | TBD                    |
+| GUEST-1  | Guest Portal V2                       | PLANIFIÉ | TBD                    |
+| OPS-1    | Housekeeping                          | PLANIFIÉ | TBD                    |
+| OPS-2    | Maintenance                           | PLANIFIÉ | TBD                    |
+| FNB-1    | Restaurant, room service et livraison | PLANIFIÉ | TBD                    |
+| PAY-1    | Paiements clients                     | PLANIFIÉ | TBD                    |
+| FIN-1    | Comptabilité et rapports financiers   | PLANIFIÉ | TBD                    |
+| HR-1     | RH et paie                            | PLANIFIÉ | TBD                    |
+| DOC-1    | Documents                             | PLANIFIÉ | TBD                    |
+| CRM-1    | CRM, communications et notifications  | PLANIFIÉ | TBD                    |
+| REPORT-1 | Rapports et tableaux de bord          | PLANIFIÉ | TBD                    |
+| AI-1     | Centre IA et agents                   | PLANIFIÉ | TBD                    |
+| MOB-1    | PWA et applications mobiles           | PLANIFIÉ | TBD                    |
+| GA       | Préparation production et pilote      | PLANIFIÉ | À décider avec Blaise  |

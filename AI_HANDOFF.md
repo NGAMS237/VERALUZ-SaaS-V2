@@ -328,3 +328,127 @@ pnpm audit
 - Aucun déploiement / Aucun Supabase distant / Aucun Resend
 - Ne lance pas Codex
 - Aucun import depuis `NGAMS237/veraluz-os`
+
+---
+
+# AI_HANDOFF — UI-1 : Horizon App Shell et interface fonctionnelle
+
+## Statut
+
+- **Projet** : VERALUZ SaaS V2
+- **Lot** : UI-1 — shell applicatif Horizon + interface Chambres, Catégories, Paramètres
+- **Branche** : `claude/ui-1-shell-rooms`
+- **Stacked sur** : CORE-1 mergé dans `main` — SHA merge `677cef4f3bb157ad519bbe95bffaa6141ed216cc`
+- **Agent** : Claude (Sonnet 5)
+- **Date** : 2026-09-02
+
+## Périmètre livré
+
+### Tokens et thème (`src/styles/tokens.css`, DECISION-009)
+
+Mapping des rôles sémantiques Horizon Signature UI System dans `--vlz-*` :
+surfaces (canvas/base/raised/soft/inverse), texte (primary/secondary/muted/
+inverse/link), bordures, focus ring, géométrie signature (organic 48px,
+signature 64px). Thème sombre via `[data-theme="dark"]`, amorcé par un script
+inline anti-FOUC (`src/components/shell/theme-script.ts`), persisté en
+`localStorage`. Palette de marque VERALUZ (DECISION-006) inchangée.
+
+### Shell applicatif (`src/components/shell/`)
+
+Sidebar Ink/Navy (navigation principale + 16 modules « À venir »), header
+(menu mobile, sélecteur tenant, bascule thème, menu utilisateur/déconnexion),
+menu mobile avec overlay et fermeture au `Escape`, navigation clavier, focus
+visible, `prefers-reduced-motion` respecté.
+
+### Routes UI-1
+
+| Route                                  | Contenu                                                  |
+| -------------------------------------- | -------------------------------------------------------- |
+| `/login`                               | Restylé Horizon — logique F1 inchangée                   |
+| `/t/[tenantSlug]/dashboard`            | Nombres réels chambres/catégories, aucune donnée simulée |
+| `/t/[tenantSlug]/rooms`                | CRUD, filtres (catégorie/statut), statut inline          |
+| `/t/[tenantSlug]/room-categories`      | CRUD, filtre actif/inactif, activation/désactivation     |
+| `/t/[tenantSlug]/settings`             | Fuseau horaire, devise, locale, check-in/check-out       |
+| `/t/[tenantSlug]/modules/[moduleSlug]` | Placeholder « À venir » générique (DECISION-011)         |
+
+### Architecture des mutations (DECISION-010)
+
+Server Actions (`*/actions.ts`) appellent directement `src/modules/*/services/`
+— même couche que les Route Handlers `kjemo/v1` (CORE-1), zéro duplication de
+logique métier. Chaque action revérifie `owner`/`admin` côté serveur (défense
+en profondeur, l'UI masque déjà les actions pour `staff`/`viewer`). Double
+soumission bloquée via `useFormStatus`/`useTransition`. `revalidatePath` après
+chaque mutation réussie.
+
+### États gérés
+
+Loading (squelettes `vlz-skeleton`), empty state, succès, erreurs de validation
+(messages de champ Zod traduits), 401/403 (redirection login / message refusé),
+404 (tenant introuvable ou slug invalide — message neutre, ne révèle pas
+l'existence du tenant), 409 (conflit de code — message français), erreur
+serveur/réseau (message générique, sans détail technique, via `error.tsx`).
+
+## Résultats de validation
+
+| Vérification                     | Résultat                                                                                         |
+| -------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `pnpm install --frozen-lockfile` | ✅ PASS                                                                                          |
+| `pnpm format:check`              | ✅ PASS sur le périmètre du diff (voir note ci-dessous)                                          |
+| `pnpm lint`                      | ✅ PASS — 0 warning                                                                              |
+| `pnpm typecheck`                 | ✅ PASS — 0 erreur                                                                               |
+| `pnpm test`                      | ✅ PASS — 189/189                                                                                |
+| `pnpm test:coverage`             | ✅ PASS — 94.76% stmts / 90.19% branches / 100% fns / 96.31% lines                               |
+| `pnpm build`                     | ✅ PASS (avec APP_ENV=production)                                                                |
+| `pnpm audit`                     | ✅ PASS — 0 vulnérabilité connue                                                                 |
+| `git diff --check` (base CORE-1) | ✅ PASS — 0 espace de fin                                                                        |
+| Scan secrets manuel              | ✅ PASS — 0 secret détecté dans le diff                                                          |
+| Garde-fous architecture          | ✅ PASS — aucun `veraluz-os`, aucun hex/px brut en composant, aucun `process.env` hors frontière |
+
+### Note environnement local (Windows)
+
+Ce poste a `core.autocrlf=true`, ce qui convertit le contenu du dépôt en CRLF
+dans la copie de travail — `pnpm format:check` local peut donc signaler des
+fichiers **non modifiés** par ce lot. Vérifié via lecture directe des blobs
+git (`git show :<fichier>`) : le contenu réellement commité est en LF pur, y
+compris pour tous les fichiers de ce diff. CI (Linux) ne rencontre pas ce
+problème.
+
+### Note Docker/Supabase local
+
+Docker indisponible dans ce sandbox (comme documenté pour F1/CORE-1). Le
+serveur `next dev` a été démarré et testé manuellement dans le Browser pane
+sans backend Supabase actif : page `/login` (clair et sombre), état d'erreur
+`?error=invalid_credentials`, responsive mobile, redirection `/` → `/login`,
+et redirection protégée `/t/veraluz-001/dashboard` → `/login` pour un
+utilisateur non authentifié — tous conformes. Les parcours authentifiés
+(dashboard réel, CRUD chambres/catégories, paramètres) n'ont **pas** pu être
+vérifiés visuellement dans ce sandbox faute de Supabase local ; ils sont
+couverts par les tests unitaires des Server Actions (permissions, validation,
+mapping d'erreurs) et par la CI GitHub Actions (`supabase-local`, Docker
+disponible).
+
+## Décisions techniques UI-1
+
+Voir `DECISIONS.md` : [DECISION-009] mapping tokens Horizon, [DECISION-010]
+Server Actions → services partagés, [DECISION-011] route générique modules
+futurs.
+
+## Périmètre respecté
+
+- ✅ Aucun import depuis `NGAMS237/veraluz-os`
+- ✅ Aucune migration distante / `supabase link` / `supabase db push`
+- ✅ Aucun secret dans les commits, logs ou fichiers (`.env.local` créé localement pour le test manuel, jamais commité — vérifié `.gitignore`)
+- ✅ Aucun push direct vers `main`
+- ✅ Aucun développement des 16 modules futurs (placeholders honnêtes uniquement)
+- ✅ Aucune donnée financière, réservation ou statistique fictive
+- ✅ Aucun email Resend
+
+## Pour le prochain agent
+
+- CORE-1 est mergé dans `main` (SHA `677cef4f3bb157ad519bbe95bffaa6141ed216cc`).
+- La branche `claude/ui-1-shell-rooms` cible directement `main`.
+- Seed local étendu (`supabase/seed.sql`) avec 3 catégories et 4 chambres de
+  démonstration pour `veraluz-001` (voir section « Test manuel local » du
+  rapport final).
+- Prochain lot suggéré : `MIG-R1` (audit fonctionnel Réservations V1, lecture
+  seule) — voir ROADMAP.md.

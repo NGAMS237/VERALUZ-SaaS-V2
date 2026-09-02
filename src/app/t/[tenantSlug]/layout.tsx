@@ -7,12 +7,15 @@
 
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getTenantContext } from "@/lib/tenant-context";
 import {
-  resolveTenantContext,
   TenantNotFoundError,
   TenantAccessDeniedError,
   TenantSlugError,
 } from "@/modules/tenant/resolver";
+import { listAccessibleTenants } from "@/modules/tenant/queries";
+import { AppShell } from "@/components/shell/app-shell";
+import type { TenantOption } from "@/components/shell/tenant-switcher";
 
 interface TenantLayoutProps {
   children: React.ReactNode;
@@ -21,35 +24,42 @@ interface TenantLayoutProps {
 
 export default async function TenantLayout({ children, params }: TenantLayoutProps) {
   const { tenantSlug } = await params;
-  const supabase = await createClient();
 
   let context;
   try {
-    context = await resolveTenantContext(supabase, tenantSlug);
+    context = await getTenantContext(tenantSlug);
   } catch (error) {
     if (error instanceof TenantSlugError || error instanceof TenantNotFoundError) {
       notFound();
     }
     if (error instanceof TenantAccessDeniedError) {
-      redirect("/login");
+      redirect(`/login?redirectTo=/t/${tenantSlug}/dashboard`);
     }
     throw error;
   }
 
-  const { tenant, role } = context;
+  const { tenant, role, userId } = context;
+
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+  const userEmail = userData.user?.email ?? "";
+
+  const accessible = await listAccessibleTenants(supabase, userId);
+  const tenantOptions: TenantOption[] = accessible.map((entry) => ({
+    slug: entry.tenant.slug,
+    name: entry.tenant.name,
+    role: entry.role,
+  }));
 
   return (
-    <div className="vlz-tenant-shell">
-      <header className="vlz-tenant-header">
-        <span className="vlz-tenant-name">{tenant.name}</span>
-        <span className="vlz-tenant-role">{role}</span>
-        <form action="/api/kjemo/v1/auth/logout" method="POST">
-          <button type="submit" className="vlz-btn-logout">
-            Déconnexion
-          </button>
-        </form>
-      </header>
-      <main className="vlz-tenant-content">{children}</main>
-    </div>
+    <AppShell
+      tenantSlug={tenant.slug}
+      tenantName={tenant.name}
+      userEmail={userEmail}
+      role={role}
+      tenantOptions={tenantOptions}
+    >
+      {children}
+    </AppShell>
   );
 }

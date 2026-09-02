@@ -78,7 +78,50 @@ Le skill `veraluz-architecture-guardian` détecte les valeurs CSS brutes dans
 `src/app`, `src/components` et `src/modules`. Il doit être exécuté avant tout commit.
 Voir `skills/veraluz-architecture-guardian/SKILL.md`.
 
-## État actuel (F0-R1)
+## Horizon Signature UI System (UI-1)
 
-Les tokens sont définis et utilisés dans `src/app/page.tsx`. Les composants UI
-seront construits en UI-1 en consommant ces tokens.
+UI-1 adopte la structure sémantique du système « Horizon Signature UI System »
+(direction artistique fournie hors dépôt) — voir `DECISIONS.md [DECISION-009]`.
+Seuls les **rôles** et la **géométrie** sont repris ; la palette de marque
+VERALUZ (`--vlz-color-brand-*`, actée en DECISION-006) reste inchangée.
+
+### Rôles de surface
+
+| Token                                | Usage                                         |
+| ------------------------------------ | --------------------------------------------- |
+| `--vlz-color-surface-canvas`         | Fond de page                                  |
+| `--vlz-color-surface-base`           | Carte standard, filtres, tables               |
+| `--vlz-color-surface-raised`         | Carte élevée, modale, popover                 |
+| `--vlz-color-surface-soft`           | Panneau discret, en-tête de table, item actif |
+| `--vlz-color-surface-inverse`        | Sidebar Ink/Navy                              |
+| `--vlz-color-surface-inverse-strong` | Survol/actif sur surface inverse              |
+
+### Rôles de texte, bordure et focus
+
+`--vlz-color-text-primary/secondary/muted/inverse/inverse-muted/link`,
+`--vlz-color-border-default/strong/inverse`, `--vlz-color-focus-ring`.
+
+### Géométrie signature
+
+`--vlz-radius-organic` (48px) et `--vlz-radius-signature` (64px) — réservés aux
+grandes surfaces (hero dashboard, carte de connexion), jamais aux tables, champs
+ou petites cartes. Voir `--vlz-radius-sm/md/lg/xl/full` pour le reste.
+
+### Thème sombre
+
+Activé via `[data-theme="dark"]` sur `<html>`, posé par un script d'amorçage
+inline (`src/components/shell/theme-script.ts`) avant hydratation pour éviter
+tout flash de thème incorrect. Seuls les tokens de **rôle** (surface/texte/
+bordure/ombre) sont redéfinis dans le bloc `[data-theme="dark"]` de
+`tokens.css` — la palette `--vlz-color-neutral-*` et `--vlz-color-brand-*`
+reste fixe. Préférence persistée en `localStorage` (`vlz-theme`), avec repli
+sur `prefers-color-scheme` si aucun choix explicite n'a été fait.
+
+## État actuel (UI-1)
+
+Les tokens sont consommés par le shell applicatif (`src/components/shell/`),
+les composants UI partagés (`src/components/ui/`) et les écrans fonctionnels
+(`src/app/t/[tenantSlug]/{dashboard,rooms,room-categories,settings}/`). Les
+feuilles de style dédiées par domaine vivent dans `src/styles/` (`shell.css`,
+`forms.css`, `feedback.css`, `tables.css`, `dashboard.css`, `auth.css`),
+toutes important exclusivement des `var(--vlz-*)`.

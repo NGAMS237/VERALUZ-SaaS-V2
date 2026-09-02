@@ -1,0 +1,75 @@
+/**
+ * src/styles/auth.css
+ * Page de connexion (/login) — habillage visuel Horizon, aucune logique modifiée.
+ */
+
+.vlz-login-container {
+  min-height: var(--vlz-viewport-min-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--vlz-space-6);
+  background: linear-gradient(
+    160deg,
+    var(--vlz-color-surface-canvas) 0%,
+    var(--vlz-color-surface-soft) 100%
+  );
+}
+
+.vlz-login-card {
+  width: 100%;
+  max-width: var(--vlz-content-max-prose);
+  background: var(--vlz-color-surface-raised);
+  border: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+  border-radius: var(--vlz-radius-lg) var(--vlz-radius-lg) var(--vlz-radius-organic)
+    var(--vlz-radius-lg);
+  box-shadow: var(--vlz-shadow-soft);
+  padding: var(--vlz-space-12) var(--vlz-space-8);
+}
+
+@media (max-width: 640px) {
+  .vlz-login-card {
+    border-radius: var(--vlz-radius-xl);
+    padding: var(--vlz-space-8) var(--vlz-space-6);
+  }
+}
+
+.vlz-login-title {
+  font-size: var(--vlz-font-size-3xl);
+  font-weight: var(--vlz-font-weight-bold);
+  color: var(--vlz-color-brand-primary);
+  letter-spacing: var(--vlz-letter-spacing-wide);
+}
+
+.vlz-login-subtitle {
+  margin-top: var(--vlz-space-2);
+  color: var(--vlz-color-text-secondary);
+  font-size: var(--vlz-font-size-base);
+}
+
+.vlz-login-error {
+  margin-top: var(--vlz-space-6);
+  padding: var(--vlz-space-3) var(--vlz-space-4);
+  background: color-mix(
+    in srgb,
+    var(--vlz-color-status-error) 10%,
+    var(--vlz-color-surface-raised)
+  );
+  border: var(--vlz-border-width-thin) solid
+    color-mix(in srgb, var(--vlz-color-status-error) 35%, transparent);
+  border-radius: var(--vlz-radius-md);
+  color: var(--vlz-color-status-error);
+  font-size: var(--vlz-font-size-sm);
+}
+
+.vlz-login-form {
+  margin-top: var(--vlz-space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--vlz-space-6);
+}
+
+.vlz-login-form .vlz-btn-primary {
+  margin-top: var(--vlz-space-2);
+  width: 100%;
+}
