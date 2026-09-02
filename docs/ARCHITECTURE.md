@@ -25,32 +25,52 @@ Voir `package.json` pour les versions exactes verrouillées.
 veraluz-v2/
 ├── src/
 │   ├── app/                    # Routes Next.js (App Router)
-│   │   ├── layout.tsx          # Root layout
-│   │   ├── page.tsx            # Page d'accueil
-│   │   ├── globals.css         # Styles globaux (importe tokens)
+│   │   ├── layout.tsx          # Root layout (amorçage thème clair/sombre)
+│   │   ├── page.tsx            # Redirige vers /login
+│   │   ├── globals.css         # Styles globaux (importe tokens + styles/*)
+│   │   ├── login/               # Connexion (F1, restylé Horizon en UI-1)
+│   │   ├── t/[tenantSlug]/     # Shell protégé du tenant
+│   │   │   ├── layout.tsx      # AppShell (sidebar, header, sélecteur tenant)
+│   │   │   ├── loading.tsx / not-found.tsx / error.tsx
+│   │   │   ├── dashboard/      # Tableau de bord — nombres réels (UI-1)
+│   │   │   ├── rooms/          # CRUD chambres, filtres, statuts (UI-1)
+│   │   │   ├── room-categories/ # CRUD catégories, activation (UI-1)
+│   │   │   ├── settings/       # Paramètres opérationnels (UI-1)
+│   │   │   ├── modules/[moduleSlug]/ # Placeholders « À venir » (UI-1)
+│   │   │   └── action-result.ts # Type partagé des Server Actions
 │   │   └── api/
 │   │       └── kjemo/
 │   │           └── v1/         # API interne VERALUZ
 │   │               ├── manifest/route.ts
-│   │               └── health/
-│   │                   ├── live/route.ts   # liveness probe
-│   │                   └── ready/route.ts  # readiness probe (F0+)
-│   ├── components/             # Composants React réutilisables
-│   │   └── ui/                 # Composants UI primitifs
+│   │               ├── health/{live,ready}/route.ts
+│   │               ├── auth/logout/route.ts
+│   │               └── t/[tenantSlug]/{rooms,room-categories,settings}/  # CORE-1
+│   ├── components/
+│   │   ├── shell/               # AppShell, Sidebar, Header, thème (UI-1)
+│   │   └── ui/                  # Composants UI primitifs (icônes, modale, badges)
 │   ├── lib/                    # Bibliothèques partagées
 │   │   ├── config/
 │   │   │   ├── env.schema.ts   # Schéma Zod des variables d'env
 │   │   │   ├── env.ts          # Export validé de la config
 │   │   │   └── version.ts      # Source unique de la version applicative
-│   │   └── utils/              # Utilitaires génériques
+│   │   ├── supabase/           # Clients Supabase serveur/navigateur (F1)
+│   │   ├── tenant-context.ts   # Résolution tenant mémoïsée par requête (UI-1)
+│   │   └── api/response.ts     # Helpers de réponse Route Handler (CORE-1)
 │   ├── instrumentation.ts      # Validation env au démarrage (Next.js hook)
-│   ├── modules/                # Modules métier (F1+)
+│   ├── modules/                # Modules métier
+│   │   ├── tenant/             # Résolution + liste des tenants accessibles (F1/UI-1)
+│   │   ├── rooms/               # Domaine chambres & catégories (CORE-1)
+│   │   └── settings/            # Domaine paramètres opérationnels (CORE-1)
 │   └── styles/
-│       └── tokens.css          # Tokens --vlz-* (source unique)
+│       ├── tokens.css          # Tokens --vlz-* (source unique)
+│       └── {shell,forms,feedback,tables,dashboard,auth}.css  # UI-1
 ├── tests/
 │   ├── setup.ts                # Initialisation des tests
 │   ├── api/                    # Tests des route handlers
+│   ├── actions/                # Tests des Server Actions UI-1
+│   ├── shell/, lib/, tenant/   # Tests navigation, tenant-context, queries
 │   └── config/                 # Tests de validation config
+├── supabase/                   # Migrations, seed, tests pgTAP (F1/CORE-1)
 ├── docs/                       # Documentation technique
 ├── skills/                     # Skills Claude/Codex
 ├── .github/
@@ -112,6 +132,10 @@ L'isolation des tenants en F1+ reposera sur :
 3. **NEXT_PUBLIC_TENANT_ID** — hint UX/routing uniquement, jamais un token d'autorisation
 
 Le premier tenant pilote est `veraluz-001` (La Résidence VERALUZ).
+
+Le sélecteur tenant du shell (UI-1) liste les établissements accessibles via
+`src/modules/tenant/queries.ts#listAccessibleTenants` — une lecture RLS-filtrée
+des `memberships` de l'utilisateur courant, jamais une source d'autorisation.
 
 ## Sécurité
 
