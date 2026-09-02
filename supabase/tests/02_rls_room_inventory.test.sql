@@ -136,7 +136,12 @@ SELECT ok(
 -- ─────────────────────────────────────────────────────────────────────────────
 
 SELECT ok(
-  (SELECT COUNT(*)::int = 2 FROM public.room_categories WHERE code = 'STD'),
+  (SELECT COUNT(*)::int = 2 FROM public.room_categories
+    WHERE code = 'STD'
+      AND tenant_id IN (
+        'aaaaaaaa-0000-0000-0000-000000000001'::uuid,
+        'bbbbbbbb-0000-0000-0000-000000000002'::uuid
+      )),
   'Code STD peut exister dans deux tenants distincts');
 
 -- ─────────────────────────────────────────────────────────────────────────────
