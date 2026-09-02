@@ -243,7 +243,7 @@ pnpm audit
 - **Lot** : CORE-1 — inventaire chambres & paramètres opérationnels
 - **Branche** : `claude/core-1-rooms-categories-settings`
 - **Stacked sur** : F1 mergé dans main — SHA merge `8a02cfa0edabeab4174ef8b52ed4476c591b5c9a`
-- **HEAD CORE-1** : _mis à jour après commit correctif R1 — voir SHA ci-dessous_
+- **HEAD CORE-1** : `7ce1d49`
 - **Agent** : Claude (Sonnet 4.6)
 - **Date** : 2026-09-01 / correctifs R1 : 2026-09-02
 
