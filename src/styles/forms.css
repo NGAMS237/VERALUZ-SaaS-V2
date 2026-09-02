@@ -1,0 +1,211 @@
+/**
+ * src/styles/forms.css
+ * Boutons, champs de formulaire et composants d'action partagés.
+ */
+
+/* ── Boutons ── */
+
+.vlz-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vlz-space-2);
+  padding: var(--vlz-space-3) var(--vlz-space-6);
+  border-radius: var(--vlz-radius-full);
+  border: var(--vlz-border-width-thin) solid transparent;
+  font-size: var(--vlz-font-size-sm);
+  font-weight: var(--vlz-font-weight-semibold);
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background-color var(--vlz-motion-fast),
+    border-color var(--vlz-motion-fast),
+    color var(--vlz-motion-fast),
+    opacity var(--vlz-motion-fast);
+  white-space: nowrap;
+}
+
+.vlz-btn:disabled,
+.vlz-btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.vlz-btn-primary,
+.vlz-login-form .vlz-btn-primary {
+  background: var(--vlz-color-brand-primary);
+  color: var(--vlz-color-text-inverse);
+}
+
+.vlz-btn-primary:not(:disabled):hover {
+  background: var(--vlz-color-surface-inverse-strong);
+}
+
+.vlz-btn-accent {
+  background: var(--vlz-color-brand-accent);
+  color: var(--vlz-color-neutral-900);
+}
+
+.vlz-btn-accent:not(:disabled):hover {
+  filter: brightness(0.94);
+}
+
+.vlz-btn-secondary {
+  background: var(--vlz-color-surface-soft);
+  color: var(--vlz-color-text-primary);
+  border-color: var(--vlz-color-border-default);
+}
+
+.vlz-btn-secondary:not(:disabled):hover {
+  background: var(--vlz-color-surface-base);
+}
+
+.vlz-btn-ghost {
+  background: transparent;
+  color: var(--vlz-color-text-secondary);
+}
+
+.vlz-btn-ghost:not(:disabled):hover {
+  background: var(--vlz-color-surface-soft);
+  color: var(--vlz-color-text-primary);
+}
+
+.vlz-btn-danger {
+  background: transparent;
+  color: var(--vlz-color-status-error);
+  border-color: color-mix(in srgb, var(--vlz-color-status-error) 40%, transparent);
+}
+
+.vlz-btn-danger:not(:disabled):hover {
+  background: color-mix(in srgb, var(--vlz-color-status-error) 8%, transparent);
+}
+
+.vlz-btn-sm {
+  padding: var(--vlz-space-2) var(--vlz-space-4);
+  font-size: var(--vlz-font-size-xs);
+}
+
+/* ── Champs de formulaire ── */
+
+.vlz-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vlz-space-2);
+}
+
+.vlz-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--vlz-space-4);
+}
+
+.vlz-label {
+  font-size: var(--vlz-font-size-sm);
+  font-weight: var(--vlz-font-weight-medium);
+  color: var(--vlz-color-text-secondary);
+}
+
+.vlz-label-required::after {
+  content: " *";
+  color: var(--vlz-color-status-error);
+}
+
+.vlz-input,
+.vlz-select,
+.vlz-textarea {
+  width: 100%;
+  padding: var(--vlz-space-3) var(--vlz-space-4);
+  font-size: var(--vlz-font-size-base);
+  font-family: inherit;
+  color: var(--vlz-color-text-primary);
+  background: var(--vlz-color-surface-soft);
+  border: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+  border-radius: var(--vlz-radius-md);
+  transition:
+    border-color var(--vlz-motion-fast),
+    background-color var(--vlz-motion-fast);
+}
+
+.vlz-textarea {
+  resize: vertical;
+  min-height: 5rem;
+}
+
+.vlz-input:hover,
+.vlz-select:hover,
+.vlz-textarea:hover {
+  border-color: var(--vlz-color-border-strong);
+}
+
+.vlz-input:focus,
+.vlz-select:focus,
+.vlz-textarea:focus {
+  outline: none;
+  background: var(--vlz-color-surface-raised);
+  border-color: var(--vlz-color-focus-ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vlz-color-focus-ring) 18%, transparent);
+}
+
+.vlz-input[aria-invalid="true"],
+.vlz-select[aria-invalid="true"] {
+  border-color: var(--vlz-color-status-error);
+}
+
+.vlz-helper-text {
+  font-size: var(--vlz-font-size-xs);
+  color: var(--vlz-color-text-muted);
+}
+
+.vlz-field-error {
+  font-size: var(--vlz-font-size-xs);
+  color: var(--vlz-color-status-error);
+}
+
+.vlz-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: var(--vlz-space-2);
+  font-size: var(--vlz-font-size-sm);
+  color: var(--vlz-color-text-secondary);
+}
+
+.vlz-checkbox-row input[type="checkbox"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--vlz-color-brand-primary);
+}
+
+/* ── Barre d'actions de formulaire ── */
+
+.vlz-form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--vlz-space-3);
+  flex-wrap: wrap;
+}
+
+/* ── Filtres ── */
+
+.vlz-filter-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--vlz-space-4);
+  flex-wrap: wrap;
+  padding: var(--vlz-space-4);
+  background: var(--vlz-color-surface-base);
+  border: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+  border-radius: var(--vlz-radius-lg);
+}
+
+.vlz-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vlz-space-1);
+  min-width: 9rem;
+}
+
+.vlz-filter-field .vlz-label {
+  font-size: var(--vlz-font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--vlz-letter-spacing-wide);
+}

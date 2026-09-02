@@ -1,4 +1,10 @@
 @import "../styles/tokens.css";
+@import "../styles/auth.css";
+@import "../styles/shell.css";
+@import "../styles/forms.css";
+@import "../styles/feedback.css";
+@import "../styles/tables.css";
+@import "../styles/dashboard.css";
 
 *,
 *::before,
@@ -11,6 +17,11 @@
 html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {
@@ -18,10 +29,13 @@ body {
   font-size: var(--vlz-font-size-base);
   font-weight: var(--vlz-font-weight-regular);
   line-height: var(--vlz-line-height-normal);
-  color: var(--vlz-color-neutral-800);
-  background-color: var(--vlz-color-brand-surface);
+  color: var(--vlz-color-text-primary);
+  background-color: var(--vlz-color-surface-canvas);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color var(--vlz-motion-normal),
+    color var(--vlz-motion-normal);
 }
 
 a {
@@ -33,4 +47,23 @@ img,
 video {
   max-width: 100%;
   height: auto;
+}
+
+/* Focus visible — cohérent sur tous les éléments interactifs */
+:focus-visible {
+  outline: var(--vlz-border-width-medium) solid var(--vlz-color-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--vlz-radius-sm);
+}
+
+/* Mouvement réduit — respecte la préférence système */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

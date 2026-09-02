@@ -1,0 +1,124 @@
+/**
+ * src/styles/tables.css
+ * Tables opérationnelles (chambres, catégories) — cartes, en-tête calme, densité efficace.
+ */
+
+.vlz-card {
+  background: var(--vlz-color-surface-base);
+  border: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+  border-radius: var(--vlz-radius-lg);
+  overflow: hidden;
+}
+
+.vlz-card-padded {
+  padding: var(--vlz-space-6);
+}
+
+.vlz-table-wrapper {
+  overflow-x: auto;
+}
+
+.vlz-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--vlz-font-size-sm);
+}
+
+.vlz-table thead {
+  background: var(--vlz-color-surface-soft);
+}
+
+.vlz-table th {
+  text-align: left;
+  padding: var(--vlz-space-3) var(--vlz-space-4);
+  font-size: var(--vlz-font-size-xs);
+  font-weight: var(--vlz-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--vlz-letter-spacing-wide);
+  color: var(--vlz-color-text-secondary);
+  white-space: nowrap;
+}
+
+.vlz-table td {
+  padding: var(--vlz-space-3) var(--vlz-space-4);
+  border-top: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+  color: var(--vlz-color-text-primary);
+  vertical-align: middle;
+}
+
+.vlz-table tbody tr {
+  transition: background-color var(--vlz-motion-fast);
+}
+
+.vlz-table tbody tr:hover {
+  background: var(--vlz-color-surface-soft);
+}
+
+.vlz-table-numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.vlz-table-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--vlz-space-2);
+}
+
+.vlz-table-cell-primary {
+  font-weight: var(--vlz-font-weight-medium);
+}
+
+.vlz-table-cell-secondary {
+  color: var(--vlz-color-text-muted);
+  font-size: var(--vlz-font-size-xs);
+}
+
+/* ── Cartes mobiles (remplacent la table en dessous de 640px) ── */
+
+.vlz-record-cards {
+  display: none;
+  flex-direction: column;
+  gap: var(--vlz-space-3);
+}
+
+.vlz-record-card {
+  background: var(--vlz-color-surface-base);
+  border: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+  border-radius: var(--vlz-radius-md);
+  padding: var(--vlz-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--vlz-space-2);
+}
+
+.vlz-record-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--vlz-space-2);
+}
+
+.vlz-record-card-title {
+  font-weight: var(--vlz-font-weight-semibold);
+  color: var(--vlz-color-text-primary);
+}
+
+.vlz-record-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--vlz-font-size-sm);
+  color: var(--vlz-color-text-secondary);
+}
+
+@media (max-width: 640px) {
+  .vlz-table-wrapper {
+    display: none;
+  }
+
+  .vlz-record-cards {
+    display: flex;
+  }
+}

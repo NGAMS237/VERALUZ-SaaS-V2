@@ -1,0 +1,308 @@
+/**
+ * src/styles/feedback.css
+ * Alertes, badges de statut, états vides et placeholders « À venir ».
+ */
+
+/* ── Alertes ── */
+
+.vlz-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vlz-space-3);
+  padding: var(--vlz-space-4);
+  border-radius: var(--vlz-radius-md);
+  border: var(--vlz-border-width-thin) solid;
+  font-size: var(--vlz-font-size-sm);
+}
+
+.vlz-alert-title {
+  font-weight: var(--vlz-font-weight-semibold);
+}
+
+.vlz-alert-error {
+  background: color-mix(in srgb, var(--vlz-color-status-error) 8%, var(--vlz-color-surface-raised));
+  border-color: color-mix(in srgb, var(--vlz-color-status-error) 35%, transparent);
+  color: var(--vlz-color-status-error);
+}
+
+.vlz-alert-warning {
+  background: color-mix(
+    in srgb,
+    var(--vlz-color-status-warning) 8%,
+    var(--vlz-color-surface-raised)
+  );
+  border-color: color-mix(in srgb, var(--vlz-color-status-warning) 35%, transparent);
+  color: var(--vlz-color-status-warning);
+}
+
+.vlz-alert-success {
+  background: color-mix(
+    in srgb,
+    var(--vlz-color-status-success) 8%,
+    var(--vlz-color-surface-raised)
+  );
+  border-color: color-mix(in srgb, var(--vlz-color-status-success) 35%, transparent);
+  color: var(--vlz-color-status-success);
+}
+
+.vlz-alert-info {
+  background: color-mix(in srgb, var(--vlz-color-status-info) 8%, var(--vlz-color-surface-raised));
+  border-color: color-mix(in srgb, var(--vlz-color-status-info) 35%, transparent);
+  color: var(--vlz-color-status-info);
+}
+
+/* ── Badges de statut ── */
+
+.vlz-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vlz-space-1);
+  padding: 0.1875rem var(--vlz-space-3);
+  border-radius: var(--vlz-radius-full);
+  font-size: var(--vlz-font-size-xs);
+  font-weight: var(--vlz-font-weight-semibold);
+  white-space: nowrap;
+}
+
+.vlz-badge::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: var(--vlz-radius-circle);
+  background: currentColor;
+}
+
+.vlz-badge-success {
+  background: color-mix(in srgb, var(--vlz-color-status-success) 14%, transparent);
+  color: var(--vlz-color-status-success);
+}
+
+.vlz-badge-warning {
+  background: color-mix(in srgb, var(--vlz-color-status-warning) 14%, transparent);
+  color: var(--vlz-color-status-warning);
+}
+
+.vlz-badge-error {
+  background: color-mix(in srgb, var(--vlz-color-status-error) 14%, transparent);
+  color: var(--vlz-color-status-error);
+}
+
+.vlz-badge-neutral {
+  background: var(--vlz-color-surface-soft);
+  color: var(--vlz-color-text-secondary);
+}
+
+.vlz-badge-info {
+  background: color-mix(in srgb, var(--vlz-color-status-info) 14%, transparent);
+  color: var(--vlz-color-status-info);
+}
+
+/* ── États vides ── */
+
+.vlz-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--vlz-space-3);
+  padding: var(--vlz-space-12) var(--vlz-space-6);
+  background: var(--vlz-color-surface-base);
+  border: 1px dashed var(--vlz-color-border-strong);
+  border-radius: var(--vlz-radius-lg);
+  color: var(--vlz-color-text-secondary);
+}
+
+.vlz-empty-state-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--vlz-radius-circle);
+  background: var(--vlz-color-surface-soft);
+  color: var(--vlz-color-text-muted);
+}
+
+.vlz-empty-state-title {
+  font-size: var(--vlz-font-size-base);
+  font-weight: var(--vlz-font-weight-semibold);
+  color: var(--vlz-color-text-primary);
+}
+
+.vlz-empty-state-description {
+  max-width: 26rem;
+  font-size: var(--vlz-font-size-sm);
+}
+
+/* ── Placeholders « À venir » (modules futurs) ── */
+
+.vlz-coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--vlz-space-4);
+  padding: var(--vlz-space-16) var(--vlz-space-6);
+  background: var(--vlz-color-surface-base);
+  border-radius: var(--vlz-radius-lg) var(--vlz-radius-lg) var(--vlz-radius-organic)
+    var(--vlz-radius-lg);
+  border: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+}
+
+.vlz-coming-soon-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--vlz-radius-lg);
+  background: color-mix(in srgb, var(--vlz-color-brand-accent) 18%, transparent);
+  color: var(--vlz-color-brand-accent);
+}
+
+.vlz-coming-soon-badge {
+  display: inline-flex;
+  padding: 0.1875rem var(--vlz-space-3);
+  border-radius: var(--vlz-radius-full);
+  background: var(--vlz-color-surface-inverse);
+  color: var(--vlz-color-text-inverse);
+  font-size: var(--vlz-font-size-xs);
+  font-weight: var(--vlz-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--vlz-letter-spacing-wide);
+}
+
+.vlz-coming-soon-title {
+  font-size: var(--vlz-font-size-xl);
+  font-weight: var(--vlz-font-weight-bold);
+  color: var(--vlz-color-text-primary);
+}
+
+.vlz-coming-soon-description {
+  max-width: 28rem;
+  color: var(--vlz-color-text-secondary);
+  font-size: var(--vlz-font-size-sm);
+}
+
+/* ── Squelettes de chargement ── */
+
+.vlz-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--vlz-color-surface-soft) 25%,
+    var(--vlz-color-surface-base) 50%,
+    var(--vlz-color-surface-soft) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--vlz-radius-md);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .vlz-skeleton {
+    animation: vlz-skeleton-shimmer 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes vlz-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.vlz-skeleton-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--vlz-radius-md);
+  flex-shrink: 0;
+}
+
+.vlz-skeleton-title {
+  width: 8rem;
+  height: 1.25rem;
+}
+
+.vlz-skeleton-header-title {
+  width: 10rem;
+  height: 1.5rem;
+}
+
+.vlz-skeleton-hero {
+  width: 100%;
+  height: 8rem;
+  border-radius: var(--vlz-radius-lg);
+}
+
+.vlz-skeleton-metric {
+  height: 6rem;
+}
+
+.vlz-skeleton-row {
+  width: 100%;
+  height: 2.75rem;
+}
+
+/* ── Modale ── */
+
+.vlz-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 18, 30, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--vlz-space-8) var(--vlz-space-4);
+  overflow-y: auto;
+  z-index: var(--vlz-z-modal);
+}
+
+.vlz-modal {
+  width: 100%;
+  max-width: 32rem;
+  background: var(--vlz-color-surface-raised);
+  border-radius: var(--vlz-radius-lg);
+  box-shadow: var(--vlz-shadow-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.vlz-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--vlz-space-5) var(--vlz-space-6);
+  border-bottom: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+}
+
+.vlz-modal-title {
+  font-size: var(--vlz-font-size-lg);
+  font-weight: var(--vlz-font-weight-semibold);
+  color: var(--vlz-color-text-primary);
+}
+
+.vlz-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--vlz-radius-full);
+  border: none;
+  background: transparent;
+  color: var(--vlz-color-text-muted);
+  cursor: pointer;
+}
+
+.vlz-modal-close:hover {
+  background: var(--vlz-color-surface-soft);
+  color: var(--vlz-color-text-primary);
+}
+
+.vlz-modal-body {
+  padding: var(--vlz-space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--vlz-space-5);
+}

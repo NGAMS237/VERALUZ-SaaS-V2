@@ -1,0 +1,423 @@
+/**
+ * src/styles/shell.css
+ * Application Shell — sidebar Ink/Navy, header, sélecteur tenant, menu mobile.
+ */
+
+.vlz-shell {
+  display: flex;
+  min-height: var(--vlz-viewport-min-full);
+  background: var(--vlz-color-surface-canvas);
+}
+
+/* ── Sidebar ── */
+
+.vlz-sidebar {
+  --vlz-sidebar-current-width: var(--vlz-sidebar-width);
+  width: var(--vlz-sidebar-current-width);
+  flex-shrink: 0;
+  background: var(--vlz-color-surface-inverse);
+  color: var(--vlz-color-text-inverse);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  z-index: var(--vlz-z-elevated);
+  transition: transform var(--vlz-motion-normal);
+}
+
+.vlz-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--vlz-space-3);
+  padding: var(--vlz-space-6) var(--vlz-space-5);
+  border-bottom: var(--vlz-border-width-thin) solid var(--vlz-color-border-inverse);
+}
+
+.vlz-sidebar-brand-mark {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--vlz-radius-md);
+  background: var(--vlz-color-brand-accent);
+  color: var(--vlz-color-neutral-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--vlz-font-weight-bold);
+  font-size: var(--vlz-font-size-lg);
+  flex-shrink: 0;
+}
+
+.vlz-sidebar-brand-text {
+  font-size: var(--vlz-font-size-lg);
+  font-weight: var(--vlz-font-weight-bold);
+  letter-spacing: var(--vlz-letter-spacing-wide);
+}
+
+.vlz-sidebar-nav {
+  flex: 1;
+  padding: var(--vlz-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--vlz-space-1);
+}
+
+.vlz-sidebar-section-title {
+  margin: var(--vlz-space-4) var(--vlz-space-3) var(--vlz-space-2);
+  font-size: var(--vlz-font-size-xs);
+  font-weight: var(--vlz-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--vlz-letter-spacing-wide);
+  color: var(--vlz-color-text-inverse-muted);
+}
+
+.vlz-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: var(--vlz-space-3);
+  padding: var(--vlz-space-3) var(--vlz-space-3);
+  border-radius: var(--vlz-radius-md);
+  color: var(--vlz-color-text-inverse-muted);
+  font-size: var(--vlz-font-size-sm);
+  font-weight: var(--vlz-font-weight-medium);
+  transition:
+    background-color var(--vlz-motion-fast),
+    color var(--vlz-motion-fast);
+}
+
+.vlz-sidebar-link:hover {
+  background: var(--vlz-color-surface-inverse-strong);
+  color: var(--vlz-color-text-inverse);
+}
+
+.vlz-sidebar-link[aria-current="page"] {
+  background: var(--vlz-color-surface-inverse-strong);
+  color: var(--vlz-color-text-inverse);
+  box-shadow: inset 3px 0 0 var(--vlz-color-brand-accent);
+}
+
+.vlz-sidebar-link-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vlz-sidebar-link-soon {
+  margin-left: auto;
+  font-size: 0.625rem;
+  font-weight: var(--vlz-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--vlz-letter-spacing-wide);
+  color: var(--vlz-color-text-inverse-muted);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.125rem var(--vlz-space-2);
+  border-radius: var(--vlz-radius-full);
+}
+
+.vlz-sidebar-footer {
+  padding: var(--vlz-space-4) var(--vlz-space-5);
+  border-top: var(--vlz-border-width-thin) solid var(--vlz-color-border-inverse);
+  font-size: var(--vlz-font-size-xs);
+  color: var(--vlz-color-text-inverse-muted);
+}
+
+/* ── Overlay mobile ── */
+
+.vlz-sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .vlz-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    transform: translateX(-100%);
+  }
+
+  .vlz-sidebar[data-open="true"] {
+    transform: translateX(0);
+  }
+
+  .vlz-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 18, 30, 0.5);
+    z-index: calc(var(--vlz-z-elevated) - 1);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--vlz-motion-normal);
+  }
+
+  .vlz-sidebar-overlay[data-open="true"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* ── Zone principale ── */
+
+.vlz-shell-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ── */
+
+.vlz-header {
+  height: var(--vlz-header-height);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--vlz-space-4);
+  padding: 0 var(--vlz-space-6);
+  background: var(--vlz-color-surface-raised);
+  border-bottom: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+  position: sticky;
+  top: 0;
+  z-index: var(--vlz-z-overlay);
+}
+
+.vlz-header-menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--vlz-radius-md);
+  color: var(--vlz-color-text-primary);
+  background: transparent;
+  border: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+@media (max-width: 960px) {
+  .vlz-header-menu-toggle {
+    display: inline-flex;
+  }
+}
+
+.vlz-header-menu-toggle:hover {
+  background: var(--vlz-color-surface-soft);
+}
+
+.vlz-header-title {
+  font-size: var(--vlz-font-size-lg);
+  font-weight: var(--vlz-font-weight-semibold);
+  color: var(--vlz-color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vlz-header-spacer {
+  flex: 1;
+}
+
+.vlz-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--vlz-space-2);
+}
+
+/* ── Sélecteur tenant ── */
+
+.vlz-tenant-switcher {
+  position: relative;
+}
+
+.vlz-tenant-switcher-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--vlz-space-2);
+  padding: var(--vlz-space-2) var(--vlz-space-3);
+  border-radius: var(--vlz-radius-md);
+  border: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+  background: var(--vlz-color-surface-soft);
+  color: var(--vlz-color-text-primary);
+  font-size: var(--vlz-font-size-sm);
+  font-weight: var(--vlz-font-weight-medium);
+  cursor: pointer;
+  max-width: 12rem;
+}
+
+.vlz-tenant-switcher-trigger span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vlz-tenant-switcher-menu {
+  position: absolute;
+  top: calc(100% + var(--vlz-space-2));
+  left: 0;
+  min-width: 14rem;
+  background: var(--vlz-color-surface-raised);
+  border: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+  border-radius: var(--vlz-radius-md);
+  box-shadow: var(--vlz-shadow-lg);
+  padding: var(--vlz-space-2);
+  z-index: var(--vlz-z-overlay);
+}
+
+.vlz-tenant-switcher-item {
+  display: flex;
+  flex-direction: column;
+  padding: var(--vlz-space-2) var(--vlz-space-3);
+  border-radius: var(--vlz-radius-sm);
+  color: var(--vlz-color-text-primary);
+  font-size: var(--vlz-font-size-sm);
+}
+
+.vlz-tenant-switcher-item:hover {
+  background: var(--vlz-color-surface-soft);
+}
+
+.vlz-tenant-switcher-item[aria-current="true"] {
+  background: color-mix(in srgb, var(--vlz-color-status-info) 10%, transparent);
+  font-weight: var(--vlz-font-weight-semibold);
+}
+
+.vlz-tenant-switcher-item-role {
+  font-size: var(--vlz-font-size-xs);
+  color: var(--vlz-color-text-muted);
+  text-transform: capitalize;
+}
+
+/* ── Bascule de thème ── */
+
+.vlz-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--vlz-radius-full);
+  border: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+  background: transparent;
+  color: var(--vlz-color-text-secondary);
+  cursor: pointer;
+}
+
+.vlz-theme-toggle:hover {
+  background: var(--vlz-color-surface-soft);
+  color: var(--vlz-color-text-primary);
+}
+
+/* ── Menu utilisateur ── */
+
+.vlz-user-menu {
+  position: relative;
+}
+
+.vlz-user-menu-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--vlz-space-2);
+  padding: var(--vlz-space-1);
+  border-radius: var(--vlz-radius-full);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.vlz-user-avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--vlz-radius-circle);
+  background: var(--vlz-color-brand-primary);
+  color: var(--vlz-color-text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--vlz-font-size-sm);
+  font-weight: var(--vlz-font-weight-semibold);
+  flex-shrink: 0;
+}
+
+.vlz-user-menu-panel {
+  position: absolute;
+  top: calc(100% + var(--vlz-space-2));
+  right: 0;
+  min-width: 13rem;
+  background: var(--vlz-color-surface-raised);
+  border: var(--vlz-border-width-thin) solid var(--vlz-color-border-default);
+  border-radius: var(--vlz-radius-md);
+  box-shadow: var(--vlz-shadow-lg);
+  padding: var(--vlz-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--vlz-space-3);
+  z-index: var(--vlz-z-overlay);
+}
+
+.vlz-user-menu-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.vlz-user-menu-email {
+  font-size: var(--vlz-font-size-sm);
+  font-weight: var(--vlz-font-weight-medium);
+  color: var(--vlz-color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vlz-user-menu-role {
+  font-size: var(--vlz-font-size-xs);
+  color: var(--vlz-color-text-muted);
+  text-transform: capitalize;
+}
+
+.vlz-btn-logout {
+  width: 100%;
+}
+
+/* ── Contenu principal ── */
+
+.vlz-shell-content {
+  flex: 1;
+  padding: var(--vlz-space-8) var(--vlz-space-6);
+  max-width: var(--vlz-container-max);
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--vlz-space-6);
+}
+
+@media (max-width: 640px) {
+  .vlz-shell-content {
+    padding: var(--vlz-space-6) var(--vlz-space-4);
+  }
+}
+
+.vlz-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--vlz-space-4);
+  flex-wrap: wrap;
+}
+
+.vlz-page-title {
+  font-size: var(--vlz-font-size-2xl);
+  font-weight: var(--vlz-font-weight-bold);
+  color: var(--vlz-color-text-primary);
+}
+
+.vlz-page-subtitle {
+  margin-top: var(--vlz-space-1);
+  color: var(--vlz-color-text-secondary);
+  font-size: var(--vlz-font-size-sm);
+}
